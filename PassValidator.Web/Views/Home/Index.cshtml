@@ -1,0 +1,161 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.2/semantic.min.css" />
+    <style type="text/css">
+        .up {
+            color: green;
+        }
+
+        .down {
+            color: red;
+        }
+    </style>
+</head>
+<body class="ui container">
+    <h1 style="margin-top: 50px;">Pkpass Validator</h1>
+    <p>
+        If you're having problems with your PKPass files, just the file and it will be validated.
+    </p>
+    <p>
+        At present, the following things will be checked:
+        <ul>
+            <li>PassTypeIdentifier and TeamIdentifier match your certificate</li>
+        </ul>
+    </p>
+    <p>
+        Your file is never saved and will exist in memory.
+    </p>
+    <p>
+        <input id="inputFile" type="file" accept=".pkpass" name="passFile" />
+    </p>
+    <p>
+        <button class="ui primary button" type="button" data-bind="click: submitForValidation, css: { loading: isValidating }">Validate</button>
+    </p>
+    <div id="results" data-bind="visible: isShowingResults" style="display:none;">
+
+        <ul data-bind="visible: processedSuccessfully" style="display:none;">
+            <li><i data-bind="css: manifestStyle"></i>Has manifest.json file</li>
+            <li><i data-bind="css: passStyle"></i>Has pass.json</li>
+            <li><i data-bind="css: signatureStyle"></i>Has signature file</li>
+            <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
+            <li><i data-bind="css: passTypeIdentifierStyle"></i>PassTypeIdentifier in signature matches value in pass.json</li>
+            <li><i data-bind="css: teamIdentifierStyle"></i>TeamIdentifier in signature matches value in pass.json</li>
+        </ul>
+        <div class="ui negative message" data-bind="visible: !processedSuccessfully()" style="display: none;">
+            Failed to process the pkpass file.
+        </div>
+    </div>
+    <hr />
+    <div>
+        Built by Tomas McGuinness, 2018 - <a href="mailto:tomas@coldbear.co.uk">tomas@coldbear.co.uk</a> - <a href="https://www.twitter.com/tomasmcguinness">@@tomasmcguinness</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.2/semantic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+    <script type="text/javascript">
+
+        function Model() {
+            var self = this;
+
+            self.isValidating = ko.observable(false);
+            self.isShowingResults = ko.observable(false);
+            self.processedSuccessfully = ko.observable(false);
+
+            self.submitForValidation = function () {
+
+
+                var fileInput = document.getElementById('inputFile');
+
+                if (fileInput.files.length == 0) {
+                    alert("Please select a pkpass file");
+                    return;
+                }
+
+                self.isValidating(true);
+
+                var file = fileInput.files[0];
+
+                var formData = new FormData();
+
+                formData.append('file', file);
+
+                var xhr = new XMLHttpRequest();
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+
+                        self.isValidating(false);
+                        self.isShowingResults(true);
+
+                        if (xhr.status === 200) {
+                            
+                            console.log(xhr.responseText);
+
+                            var jsonResponse = JSON.parse(xhr.responseText);
+
+                            self.processedSuccessfully(true);
+                            self.hasManifest(jsonResponse.hasManifest);
+                            self.hasPass(jsonResponse.hasPass);
+                            self.hasSignature(jsonResponse.hasSignature);
+                            self.signedByApple(jsonResponse.signedByApple);
+                            self.hasMatchingPassTypeIdentifier(jsonResponse.passTypeIdentifierMatches);
+                            self.hasMatchingTeamIdentifier(jsonResponse.teamIdentifierMatches);
+                        } else {
+                            self.processedSuccessfully(false);
+                        }
+                    }
+                }
+
+                xhr.open('POST', '/api/validation', true);
+                xhr.send(formData);
+            };
+
+            self.getStyle = function (value) {
+                return value ? "thumbs up outline icon" : "thumbs down outline icon";
+            }
+
+            self.hasManifest = ko.observable(false);
+            self.manifestStyle = ko.computed(function () {
+                return self.getStyle(self.hasManifest());
+            });
+
+            self.hasPass = ko.observable(false);
+            self.passStyle = ko.computed(function () {
+                return self.getStyle(self.hasPass());
+            });
+
+            self.hasSignature = ko.observable(false);
+            self.signatureStyle = ko.computed(function () {
+                return self.getStyle(self.hasSignature());
+            });
+
+            self.hasMatchingPassTypeIdentifier = ko.observable(false);
+            self.passTypeIdentifierStyle = ko.computed(function () {
+                return self.getStyle(self.hasMatchingPassTypeIdentifier());
+            });
+
+            self.hasMatchingTeamIdentifier = ko.observable(false);
+            self.teamIdentifierStyle = ko.computed(function () {
+                return self.getStyle(self.hasMatchingTeamIdentifier());
+            });
+
+            self.signedByApple = ko.observable(false);
+            self.signedByAppleStyle = ko.computed(function () {
+                return self.getStyle(self.signedByApple());
+            });
+        }
+
+        var viewModel = new Model();
+        ko.applyBindings(viewModel);
+    </script>
+</body>
+</html>

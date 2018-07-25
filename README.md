@@ -4,5 +4,9 @@ Checks the validity of a pkpass file by checking its signature and contents matc
 ## Motivation
 Questions pop up on StackOverflow about invalid passes and the cause, usually, is a problem in the payload. This project represents my attempt to help developer diagnose the issues themselves. 
 
-## Where is it?
+## Where is it hosted?
 The project is available at https://pkpassvalidator.azurewebsites.net and can be used right now. I'll extend its capabilities over time.
+
+## Support the project
+If you find this utility useful, please consider donating by buying me a coffee - https://www.buymeacoffee.com/fMKJ2NnQ3
+

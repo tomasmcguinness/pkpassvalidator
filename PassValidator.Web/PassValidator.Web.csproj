@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
+    <UserSecretsId>7ec52d69-2f70-4f42-bcba-e87c9dff6392</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

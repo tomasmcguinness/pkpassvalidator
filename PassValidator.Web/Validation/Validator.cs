@@ -20,13 +20,13 @@ namespace PassValidator.Web.Validation
             string signaturePassTypeIdentifier = null;
             string signatureTeamIdentifier = null;
             string expirationDate = null;
+            byte[] manifestFile = null;
+            byte[] signatureFile = null;
 
             using (MemoryStream zipToOpen = new MemoryStream(passContent))
             {
                 using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read, false))
                 {
-                    byte[] manifestFile = null;
-
                     foreach (var e in archive.Entries)
                     {
                         if (e.Name.ToLower().Equals("manifest.json"))
@@ -70,17 +70,7 @@ namespace PassValidator.Web.Validation
 
                         if (e.Name.ToLower().Equals("signature"))
                         {
-                            ContentInfo contentInfo = new ContentInfo(manifestFile);
-                            SignedCms signedCms = new SignedCms(contentInfo, true);
-
-                            try
-                            {
-                                signedCms.CheckSignature(true);
-                            }
-                            catch
-                            {
-
-                            }
+                            result.HasSignature = true;
 
                             using (var stream = e.Open())
                             {
@@ -88,42 +78,53 @@ namespace PassValidator.Web.Validation
                                 {
                                     stream.CopyTo(ms);
                                     ms.Position = 0;
-
-                                    signedCms.Decode(ms.ToArray());
-
-                                    var signer = signedCms.SignerInfos[0];
-
-                                    result.SignedByApple = signer.Certificate.IssuerName.Name == "CN=Apple Worldwide Developer Relations Certification Authority, OU=Apple Worldwide Developer Relations, O=Apple Inc., C=US";
-
-                                    if (result.SignedByApple)
-                                    {
-                                        Debug.WriteLine(signer.Certificate);
-
-                                        var cnValues = Parse(signer.Certificate.Subject, "CN");
-                                        var ouValues = Parse(signer.Certificate.Subject, "OU");
-
-                                        var passTypeIdentifierSubject = cnValues[0];
-                                        signaturePassTypeIdentifier = passTypeIdentifierSubject.Replace("Pass Type ID: ", "");
-
-                                        if (ouValues != null && ouValues.Count > 0)
-                                        {
-                                            signatureTeamIdentifier = ouValues[0];
-                                        }
-
-                                        Debug.WriteLine(signer.Certificate.IssuerName.Name);
-
-                                        result.HasSignatureExpired = signer.Certificate.NotAfter < DateTime.UtcNow;
-                                        result.SignatureExpirationDate = signer.Certificate.NotAfter.ToString("yyyy-MM-dd HH:mm:ss");
-                                    }
+                                    signatureFile = ms.ToArray();
                                 }
+
                             }
-
-                            result.HasSignature = true;
                         }
-
-                        Debug.WriteLine(e.FullName);
                     }
                 }
+            }
+
+            ContentInfo contentInfo = new ContentInfo(manifestFile);
+            SignedCms signedCms = new SignedCms(contentInfo, true);
+
+            signedCms.Decode(signatureFile);
+
+            try
+            {
+                signedCms.CheckSignature(true);
+            }
+            catch
+            {
+
+            }
+
+            var signer = signedCms.SignerInfos[0];
+
+            result.SignedByApple = signer.Certificate.IssuerName.Name == "CN=Apple Worldwide Developer Relations Certification Authority, OU=Apple Worldwide Developer Relations, O=Apple Inc., C=US";
+
+
+            if (result.SignedByApple)
+            {
+                Debug.WriteLine(signer.Certificate);
+
+                var cnValues = Parse(signer.Certificate.Subject, "CN");
+                var ouValues = Parse(signer.Certificate.Subject, "OU");
+
+                var passTypeIdentifierSubject = cnValues[0];
+                signaturePassTypeIdentifier = passTypeIdentifierSubject.Replace("Pass Type ID: ", "");
+
+                if (ouValues != null && ouValues.Count > 0)
+                {
+                    signatureTeamIdentifier = ouValues[0];
+                }
+
+                Debug.WriteLine(signer.Certificate.IssuerName.Name);
+
+                result.HasSignatureExpired = signer.Certificate.NotAfter < DateTime.UtcNow;
+                result.SignatureExpirationDate = signer.Certificate.NotAfter.ToString("yyyy-MM-dd HH:mm:ss");
             }
 
             result.PassTypeIdentifierMatches = passTypeIdentifier == signaturePassTypeIdentifier;

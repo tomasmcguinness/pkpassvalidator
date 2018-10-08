@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -18,6 +19,7 @@ namespace PassValidator.Web.Validation
             string teamIdentifier = null;
             string signaturePassTypeIdentifier = null;
             string signatureTeamIdentifier = null;
+            string expirationDate = null;
 
             using (MemoryStream zipToOpen = new MemoryStream(passContent))
             {
@@ -57,6 +59,11 @@ namespace PassValidator.Web.Validation
                                     var jsonObject = JObject.Parse(Encoding.UTF8.GetString(file));
                                     passTypeIdentifier = jsonObject["passTypeIdentifier"].Value<string>();
                                     teamIdentifier = jsonObject["teamIdentifier"].Value<string>();
+
+                                    if (jsonObject.ContainsKey("expirationDate"))
+                                    {
+                                        expirationDate = jsonObject["expirationDate"].Value<string>();
+                                    }
                                 }
                             }
                         }
@@ -104,6 +111,9 @@ namespace PassValidator.Web.Validation
                                         }
 
                                         Debug.WriteLine(signer.Certificate.IssuerName.Name);
+
+                                        result.HasSignatureExpired = signer.Certificate.NotAfter < DateTime.UtcNow;
+                                        result.SignatureExpirationDate = signer.Certificate.NotAfter.ToString("yyyy-MM-dd HH:mm:ss");
                                     }
                                 }
                             }

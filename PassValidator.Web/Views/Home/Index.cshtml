@@ -3,6 +3,8 @@
     Layout = null;
 }
 
+
+
 <!DOCTYPE html>
 
 <html>
@@ -19,17 +21,62 @@
         .down {
             color: red;
         }
+
+        .bmc-button img {
+            width: 27px !important;
+            margin-bottom: 1px !important;
+            box-shadow: none !important;
+            border: none !important;
+            vertical-align: middle !important;
+        }
+
+        .bmc-button {
+            line-height: 36px !important;
+            height: 37px !important;
+            text-decoration: none !important;
+            display: inline-flex !important;
+            color: #FFFFFF !important;
+            background-color: #FF813F !important;
+            border-radius: 3px !important;
+            border: 1px solid transparent !important;
+            padding: 1px 9px !important;
+            font-size: 23px !important;
+            letter-spacing: 0.6px !important;
+            box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+            -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+            margin: 0 auto !important;
+            font-family: 'Cookie', cursive !important;
+            -webkit-box-sizing: border-box !important;
+            box-sizing: border-box !important;
+            -o-transition: 0.3s all linear !important;
+            -webkit-transition: 0.3s all linear !important;
+            -moz-transition: 0.3s all linear !important;
+            -ms-transition: 0.3s all linear !important;
+            transition: 0.3s all linear !important;
+        }
+
+            .bmc-button:hover, .bmc-button:active, .bmc-button:focus {
+                -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+                text-decoration: none !important;
+                box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+                opacity: 0.85 !important;
+                color: #FFFFFF !important;
+            }
     </style>
 </head>
 <body class="ui container">
     <h1 style="margin-top: 50px;">Pkpass Validator</h1>
     <p>
-        If you're having problems with your PKPass files, just the file and it will be validated.
+        If you're having problems with your PKPass files, just upload your pkpass file and it will be validated. This project is on Github and you can find the source code
+        at <a href="https://github.com/tomasmcguinness/pkpassvalidator">https://github.com/tomasmcguinness/pkpassvalidator</a>.
     </p>
+    <h3>What does it do?</h3>
     <p>
-        At present, the following things will be checked:
+        Your file is uploaded and unzipped into memory. Each of the files is examied and checked to ensure it meets Apple's requirements. At present, the following things will be checked:
         <ul>
-            <li>PassTypeIdentifier and TeamIdentifier match your certificate</li>
+            <li>Manifest.json, pass.json and signature file are present</li>
+            <li>Your PassTypeIdentifier and TeamIdentifier in your pass.json matches your certificate</li>
+            <li>Your pass is signed by Apple and the signature is valid</li>
         </ul>
     </p>
     <p>
@@ -48,6 +95,7 @@
             <li><i data-bind="css: passStyle"></i>Has pass.json</li>
             <li><i data-bind="css: signatureStyle"></i>Has signature file</li>
             <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
+            <li><i data-bind="css: signatureExpirationDateStyle"></i>Signature Expires: <span data-bind="text: signatureExpirationDate"></span></li>
             <li><i data-bind="css: passTypeIdentifierStyle"></i>PassTypeIdentifier in signature matches value in pass.json</li>
             <li><i data-bind="css: teamIdentifierStyle"></i>TeamIdentifier in signature matches value in pass.json</li>
         </ul>
@@ -55,6 +103,18 @@
             Failed to process the pkpass file.
         </div>
     </div>
+    <h2>Supporting this project</h2>
+    <p>
+        If you find pkpass validator useful, please consider buying me a coffee using the button below:
+    </p>
+    <p>
+        <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet"><a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/fMKJ2NnQ3"><img src="https://www.buymeacoffee.com/assets/img/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span></a>
+    </p>
+    <h2>Release History</h2>
+    <ul>
+        <li><a class="ui small blue label">14th August 2018</a> - Added check to ensure signature is in date</li>
+        <li><a class="ui small blue label">25th July 2018</a> - First release with basic siganture checks</li>
+    </ul>
     <hr />
     <div>
         Built by Tomas McGuinness, 2018 - <a href="mailto:tomas@coldbear.co.uk">tomas@coldbear.co.uk</a> - <a href="https://www.twitter.com/tomasmcguinness">@@tomasmcguinness</a>
@@ -97,7 +157,7 @@
                         self.isShowingResults(true);
 
                         if (xhr.status === 200) {
-                            
+
                             console.log(xhr.responseText);
 
                             var jsonResponse = JSON.parse(xhr.responseText);
@@ -109,6 +169,8 @@
                             self.signedByApple(jsonResponse.signedByApple);
                             self.hasMatchingPassTypeIdentifier(jsonResponse.passTypeIdentifierMatches);
                             self.hasMatchingTeamIdentifier(jsonResponse.teamIdentifierMatches);
+                            self.signatureExpirationDate(jsonResponse.signatureExpirationDate);
+                            self.hasSignatureExpired(jsonResponse.hasSignatureExpired);
                         } else {
                             self.processedSuccessfully(false);
                         }
@@ -151,6 +213,12 @@
             self.signedByApple = ko.observable(false);
             self.signedByAppleStyle = ko.computed(function () {
                 return self.getStyle(self.signedByApple());
+            });
+
+            self.signatureExpirationDate = ko.observable(null);
+            self.hasSignatureExpired = ko.observable(false);
+            self.signatureExpirationDateStyle = ko.computed(function () {
+                return self.getStyle(!self.hasSignatureExpired());
             });
         }
 

@@ -10,7 +10,10 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
+    <title>PKPassValidator - validate your pkpass files quickly and easily</title>
+    <meta name="description" content="Validate your pkpass file. This validator will check your packages for correctness and help you diagnose issues." />
+    <meta name="keywords" content="apple wallet pkpass passbook passkit" />
+    <meta name="author" content="Tomas McGuinness" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.2/semantic.min.css" />
     <style type="text/css">
@@ -110,14 +113,20 @@
     <p>
         <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet"><a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/fMKJ2NnQ3"><img src="https://www.buymeacoffee.com/assets/img/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span></a>
     </p>
+    <h2>Checks to be added</h2>
+    <ul>
+        <li>Ensure webservice url is valid and https</li>
+        <li>Ensure dates are valid ISO 8601</li>
+    </ul>
     <h2>Release History</h2>
     <ul>
+        <li><a class="ui small blue label">7th October 2018</a> - Fixed issue validating passes due to order of file processing</li>
         <li><a class="ui small blue label">14th August 2018</a> - Added check to ensure signature is in date</li>
         <li><a class="ui small blue label">25th July 2018</a> - First release with basic siganture checks</li>
     </ul>
     <hr />
     <div>
-        Built by Tomas McGuinness, 2018 - <a href="mailto:tomas@coldbear.co.uk">tomas@coldbear.co.uk</a> - <a href="https://www.twitter.com/tomasmcguinness">@@tomasmcguinness</a>
+        Built by Tomas McGuinness, 2018 - <a href="mailto:tomas@coldbear.co.uk">tomas@coldbear.co.uk</a> - <a href="https://www.twitter.com/tomasmcguinness">@@tomasmcguinness</a> - <a href="https://wwww.tomasmcguinness.com">tomasmcguinness.com</a>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.2/semantic.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>

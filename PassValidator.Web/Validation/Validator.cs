@@ -19,7 +19,6 @@ namespace PassValidator.Web.Validation
             string teamIdentifier = null;
             string signaturePassTypeIdentifier = null;
             string signatureTeamIdentifier = null;
-            string expirationDate = null;
             byte[] manifestFile = null;
             byte[] signatureFile = null;
 
@@ -58,27 +57,31 @@ namespace PassValidator.Web.Validation
 
                                     var jsonObject = JObject.Parse(Encoding.UTF8.GetString(file));
 
-                                    passTypeIdentifier = jsonObject["passTypeIdentifier"].Value<string>();
+                                    passTypeIdentifier = GetKeyStringValue(jsonObject, "passTypeIdentifier");
                                     result.HasPassTypeIdentifier = !string.IsNullOrWhiteSpace(passTypeIdentifier);
 
-                                    teamIdentifier = jsonObject["teamIdentifier"].Value<string>();
+                                    teamIdentifier = GetKeyStringValue(jsonObject, "teamIdentifier");
                                     result.HasTeamIdentifier = !string.IsNullOrWhiteSpace(teamIdentifier);
 
-                                    var description = jsonObject["description"].Value<string>();
+                                    var description = GetKeyStringValue(jsonObject, "description");
                                     result.HasDescription = !string.IsNullOrWhiteSpace(description);
 
-                                    var formatVersion = jsonObject["formatVersion"].Value<int>();
-                                    result.HasFormatVersion = formatVersion == 1;
+                                    if (jsonObject.ContainsKey("formatVersion"))
+                                    {
+                                        var formatVersion = jsonObject["formatVersion"].Value<int>();
+                                        result.HasFormatVersion = formatVersion == 1;
+                                    }
 
-                                    var serialNumber = jsonObject["serialNumber"].Value<string>();
+                                    var serialNumber = GetKeyStringValue(jsonObject, "serialNumber");
                                     result.HasSerialNumber = !string.IsNullOrWhiteSpace(serialNumber);
 
-                                    var organizationName = jsonObject["organizationName"].Value<string>();
+                                    var organizationName = GetKeyStringValue(jsonObject, "organisationName");
                                     result.HasOrganizationName = !string.IsNullOrWhiteSpace(organizationName);
 
-                                    if (jsonObject.ContainsKey("expirationDate"))
+                                    if (jsonObject.ContainsKey("appLaunchURL"))
                                     {
-                                        expirationDate = jsonObject["expirationDate"].Value<string>();
+                                        result.HasAppLaunchUrl = true;
+                                        result.HasAssociatedStoreIdentifiers = jsonObject.ContainsKey("associatedStoreIdentifiers");
                                     }
                                 }
                             }
@@ -162,6 +165,11 @@ namespace PassValidator.Web.Validation
             result.TeamIdentifierMatches = teamIdentifier == signatureTeamIdentifier;
 
             return result;
+        }
+
+        private string GetKeyStringValue(JObject jsonObject, string key)
+        {
+            return jsonObject.ContainsKey(key) ? jsonObject[key].Value<string>() : null;
         }
 
         public static List<string> Parse(string data, string delimiter)

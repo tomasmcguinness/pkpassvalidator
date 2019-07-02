@@ -1,9 +1,6 @@
-﻿
-@{
+﻿@{
     Layout = null;
 }
-
-
 
 <!DOCTYPE html>
 
@@ -92,39 +89,53 @@
         <button class="ui primary button" type="button" data-bind="click: submitForValidation, css: { loading: isValidating }">Validate</button>
     </p>
     <div id="results" data-bind="visible: isShowingResults" style="display:none;">
+        <h2>Validation Results:</h2>
         <div data-bind="visible: processedSuccessfully" style="display:none;">
             <h3>File Structure</h3>
             <ul>
-                <li><i data-bind="css: getStyle(this.hasManifest())"></i>Has manifest.json file</li>
-                <li><i data-bind="css: passStyle"></i>Has pass.json</li>
-                <li><i data-bind="css: signatureStyle"></i>Has signature file</li>
-                <li><i data-bind="css: icon1xStyle"></i>Has icon.png file</li>
-                <li><i data-bind="css: icon2xStyle"></i>Has icon@2x.png file</li>
-                <li><i data-bind="css: icon3xStyle"></i>Has icon@3x.png file</li>
+                <li><i data-bind="css: getStyle(hasManifest())"></i>Has manifest.json file</li>
+                <li><i data-bind="css: getStyle(hasPass())"></i>Has pass.json</li>
+                <li><i data-bind="css: getStyle(hasSignature())"></i>Has signature file</li>
+                <li><i data-bind="css: getStyle(hasIcon1x())"></i>Has icon.png file</li>
+                <li><i data-bind="css: getStyle(hasIcon2x())"></i>Has icon@2x.png file</li>
+                <li><i data-bind="css: getStyle(hasIcon3x())"></i>Has icon@3x.png file</li>
             </ul>
 
             <h3>Standard Keys</h3>
             <ul>
-                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
-                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
-                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
-                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
-                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
-                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
+                <li><i data-bind="css: getStyle(hasDescription())"></i>Has description</li>
+                <li><i data-bind="css: getStyle(hasFormatVersion())"></i>Has formatVersion with value of 1</li>
+                <li><i data-bind="css: getStyle(hasOrganizationName())"></i>Has organizationName</li>
+                <li><i data-bind="css: getStyle(hasPassTypeIdentifier())"></i>Has passTypeIdentifier</li>
+                <li><i data-bind="css: getStyle(hasSerialNumber())"></i>Has serialNumber</li>
+                <li><i data-bind="css: getStyle(hasTeamIdentifier())"></i>Has teamIdentifier</li>
             </ul>
+
+            <div data-bind="visible: hasAssociatedStoreIdentifiers() || hasAppLaunchUrl()">
+                <h3>Associated App Keys</h3>
+                <ul>
+                    <li><i data-bind="css: getStyle(hasAppLaunchUrl())"></i>Has appLaunchUrl</li>
+                    <li><i data-bind="css: getStyle(hasAssociatedStoreIdentifiers())"></i>Has associatedStoreIdentifiers</li>
+
+                    <li data-bind="visible: hasAppLaunchUrl">
+                        <i data-bind="css: getStyle(hasAssociatedStoreIdentifiers())"></i>The appLaunchUrl key requires associatedStoreIdentifiers key
+                    </li>
+                </ul>
+            </div>
 
             <h3>Signature</h3>
             <ul>
-                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
-                <li><i data-bind="css: signatureExpirationDateStyle"></i>Signature Expires: <span data-bind="text: signatureExpirationDate"></span></li>
-                <li><i data-bind="css: passTypeIdentifierStyle"></i>PassTypeIdentifier in signature matches value in pass.json</li>
-                <li><i data-bind="css: teamIdentifierStyle"></i>TeamIdentifier in signature matches value in pass.json</li>
+                <li><i data-bind="css: getStyle(signedByApple())"></i>Signed by Apple</li>
+                <li><i data-bind="css: getStyle(!hasSignatureExpired())"></i>Signature not expired (<span data-bind="text: signatureExpirationDate"></span>)</li>
+                <li><i data-bind="css: getStyle(hasMatchingPassTypeIdentifier())"></i>PassTypeIdentifier in signature matches value in pass.json</li>
+                <li><i data-bind="css: getStyle(hasMatchingTeamIdentifier())"></i>TeamIdentifier in signature matches value in pass.json</li>
             </ul>
         </div>
         <div class="ui negative message" data-bind="visible: !processedSuccessfully()" style="display: none;">
             Failed to process the pkpass file.
         </div>
     </div>
+    <hr />
     <h2>Supporting this project</h2>
     <p>
         If you find pkpass validator useful, please consider buying me a coffee using the button below:
@@ -132,16 +143,17 @@
     <p>
         <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet"><a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/fMKJ2NnQ3"><img src="https://www.buymeacoffee.com/assets/img/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span></a>
     </p>
+    <h2>Release History</h2>
+    <ul>
+        <li><a class="ui small blue label">2nd July 2019</a> - Icon files checked. Standard and Associated App keys checked</li>
+        <li><a class="ui small blue label">2nd October 2018</a> - Updating validation to handle different order of files</li>
+        <li><a class="ui small blue label">14th August 2018</a> - Added check to ensure signature is in date</li>
+        <li><a class="ui small blue label">25th July 2018</a> - First release with basic siganture checks</li>
+    </ul>
     <h2>Checks to be added</h2>
     <ul>
         <li>Ensure webservice url is valid and https</li>
         <li>Ensure dates are valid ISO 8601</li>
-    </ul>
-    <h2>Release History</h2>
-    <ul>
-        <li><a class="ui small blue label">2nd October 2018</a> - Updating validation to handle different order of files</li>
-        <li><a class="ui small blue label">14th August 2018</a> - Added check to ensure signature is in date</li>
-        <li><a class="ui small blue label">25th July 2018</a> - First release with basic siganture checks</li>
     </ul>
     <hr />
     <div>
@@ -191,18 +203,23 @@
                             var jsonResponse = JSON.parse(xhr.responseText);
 
                             self.processedSuccessfully(true);
+
                             self.hasManifest(jsonResponse.hasManifest);
                             self.hasPass(jsonResponse.hasPass);
-                            self.hasIcon1x(jsonResponse.HasIcon1x);
-                            self.hasIcon2x(jsonResponse.HasIcon2x);
-                            self.hasIcon3x(jsonResponse.HasIcon3x);
+                            self.hasSignature(jsonResponse.hasSignature);
+                            self.hasIcon1x(jsonResponse.hasIcon1x);
+                            self.hasIcon2x(jsonResponse.hasIcon2x);
+                            self.hasIcon3x(jsonResponse.hasIcon3x);
 
-                            self.hasPassTypeIdentifier(result.HasPassTypeIdentifier);
-                            self.hasTeamIdentifier(result.HasTeamIdentifier);
-                            self.hasDescription(result.HasDescription);
-                            self.hasFormatVersion(result.HasFormatVersion);
-                            self.hasSerialNumber(result.HasSerialNumber);
-                            self.hasOrganizationName(result.HasOrganizationName); 
+                            self.hasPassTypeIdentifier(jsonResponse.hasPassTypeIdentifier);
+                            self.hasTeamIdentifier(jsonResponse.hasTeamIdentifier);
+                            self.hasDescription(jsonResponse.hasDescription);
+                            self.hasFormatVersion(jsonResponse.hasFormatVersion);
+                            self.hasSerialNumber(jsonResponse.hasSerialNumber);
+                            self.hasOrganizationName(jsonResponse.hasOrganizationName);
+
+                            self.hasAppLaunchUrl(jsonResponse.hasAppLaunchUrl);
+                            self.hasAssociatedStoreIdentifiers(jsonResponse.hasAssociatedStoreIdentifiers);
 
                             self.signedByApple(jsonResponse.signedByApple);
                             self.hasMatchingPassTypeIdentifier(jsonResponse.passTypeIdentifierMatches);
@@ -225,34 +242,11 @@
             }
 
             self.hasManifest = ko.observable(false);
-            self.manifestStyle = ko.computed(function () {
-                return self.getStyle(self.hasManifest());
-            });
-
             self.hasPass = ko.observable(false);
-            self.passStyle = ko.computed(function () {
-                return self.getStyle(self.hasPass());
-            });
-
             self.hasSignature = ko.observable(false);
-            self.signatureStyle = ko.computed(function () {
-                return self.getStyle(self.hasSignature());
-            });
-
             self.hasIcon1x = ko.observable(false);
-            self.icon1xStyle = ko.computed(function () {
-                return self.getStyle(self.hasIcon1x());
-            });
-
             self.hasIcon2x = ko.observable(false);
-            self.icon2xStyle = ko.computed(function () {
-                return self.getStyle(self.hasIcon2x());
-            });
-
             self.hasIcon3x = ko.observable(false);
-            self.icon3xStyle = ko.computed(function () {
-                return self.getStyle(self.hasIcon3x());
-            });
 
             self.hasPassTypeIdentifier = ko.observable(false);
             self.hasTeamIdentifier = ko.observable(false);
@@ -261,26 +255,14 @@
             self.hasSerialNumber = ko.observable(false);
             self.hasOrganizationName = ko.observable(false);
 
+            self.hasAppLaunchUrl = ko.observable(false);
+            self.hasAssociatedStoreIdentifiers = ko.observable(false);
+
             self.hasMatchingPassTypeIdentifier = ko.observable(false);
-            self.passTypeIdentifierStyle = ko.computed(function () {
-                return self.getStyle(self.hasMatchingPassTypeIdentifier());
-            });
-
             self.hasMatchingTeamIdentifier = ko.observable(false);
-            self.teamIdentifierStyle = ko.computed(function () {
-                return self.getStyle(self.hasMatchingTeamIdentifier());
-            });
-
             self.signedByApple = ko.observable(false);
-            self.signedByAppleStyle = ko.computed(function () {
-                return self.getStyle(self.signedByApple());
-            });
-
             self.signatureExpirationDate = ko.observable(null);
             self.hasSignatureExpired = ko.observable(false);
-            self.signatureExpirationDateStyle = ko.computed(function () {
-                return self.getStyle(!self.hasSignatureExpired());
-            });
         }
 
         var viewModel = new Model();

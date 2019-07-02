@@ -1,31 +1,43 @@
-﻿using System;
-
-namespace PassValidator.Web.Validation
+﻿namespace PassValidator.Web.Validation
 {
     public class ValidationResult
     {
-        public ValidationResult()
-        {
-        }
+        public bool HasPass { get; set; }
 
-        public bool IsValid { get; set; }
+        public bool HasManifest { get; set; }
 
-        public bool HasPass { get; internal set; }
-        public bool HasManifest { get; internal set; }
-        public bool HasSignature { get; internal set; }
-        public bool TeamIdentifierMatches { get; internal set; }
-        public bool PassTypeIdentifierMatches { get; internal set; }
-        public bool SignedByApple { get; internal set; }
-        public bool HasSignatureExpired { get; internal set; }
-        public string SignatureExpirationDate { get; internal set; }
-        public bool Has3xIcon { get; internal set; }
-        public bool Has2xIcon { get; internal set; }
-        public bool HasIcon1x { get; internal set; }
-        public bool HasPassTypeIdentifier { get; internal set; }
-        public bool HasTeamIdentifier { get; internal set; }
-        public bool HasDescription { get; internal set; }
-        public bool HasFormatVersion { get; internal set; }
-        public bool HasSerialNumber { get; internal set; }
-        public bool HasOrganizationName { get; internal set; }
+        public bool HasSignature { get; set; }
+
+        public bool TeamIdentifierMatches { get; set; }
+
+        public bool PassTypeIdentifierMatches { get; set; }
+
+        public bool SignedByApple { get; set; }
+
+        public bool HasSignatureExpired { get; set; }
+
+        public string SignatureExpirationDate { get; set; }
+
+        public bool Has3xIcon { get; set; }
+
+        public bool Has2xIcon { get; set; }
+
+        public bool HasIcon1x { get; set; }
+
+        public bool HasPassTypeIdentifier { get; set; }
+
+        public bool HasTeamIdentifier { get; set; }
+
+        public bool HasDescription { get; set; }
+
+        public bool HasFormatVersion { get; set; }
+
+        public bool HasSerialNumber { get; set; }
+
+        public bool HasOrganizationName { get; set; }
+
+        public bool HasAppLaunchUrl { get; set; }
+
+        public bool HasAssociatedStoreIdentifiers { get; set; }
     }
 }

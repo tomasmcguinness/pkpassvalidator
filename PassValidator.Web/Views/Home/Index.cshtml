@@ -92,16 +92,35 @@
         <button class="ui primary button" type="button" data-bind="click: submitForValidation, css: { loading: isValidating }">Validate</button>
     </p>
     <div id="results" data-bind="visible: isShowingResults" style="display:none;">
+        <div data-bind="visible: processedSuccessfully" style="display:none;">
+            <h3>File Structure</h3>
+            <ul>
+                <li><i data-bind="css: getStyle(this.hasManifest())"></i>Has manifest.json file</li>
+                <li><i data-bind="css: passStyle"></i>Has pass.json</li>
+                <li><i data-bind="css: signatureStyle"></i>Has signature file</li>
+                <li><i data-bind="css: icon1xStyle"></i>Has icon.png file</li>
+                <li><i data-bind="css: icon2xStyle"></i>Has icon@2x.png file</li>
+                <li><i data-bind="css: icon3xStyle"></i>Has icon@3x.png file</li>
+            </ul>
 
-        <ul data-bind="visible: processedSuccessfully" style="display:none;">
-            <li><i data-bind="css: manifestStyle"></i>Has manifest.json file</li>
-            <li><i data-bind="css: passStyle"></i>Has pass.json</li>
-            <li><i data-bind="css: signatureStyle"></i>Has signature file</li>
-            <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
-            <li><i data-bind="css: signatureExpirationDateStyle"></i>Signature Expires: <span data-bind="text: signatureExpirationDate"></span></li>
-            <li><i data-bind="css: passTypeIdentifierStyle"></i>PassTypeIdentifier in signature matches value in pass.json</li>
-            <li><i data-bind="css: teamIdentifierStyle"></i>TeamIdentifier in signature matches value in pass.json</li>
-        </ul>
+            <h3>Standard Keys</h3>
+            <ul>
+                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
+                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
+                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
+                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
+                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
+                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
+            </ul>
+
+            <h3>Signature</h3>
+            <ul>
+                <li><i data-bind="css: signedByAppleStyle"></i>Signed by Apple</li>
+                <li><i data-bind="css: signatureExpirationDateStyle"></i>Signature Expires: <span data-bind="text: signatureExpirationDate"></span></li>
+                <li><i data-bind="css: passTypeIdentifierStyle"></i>PassTypeIdentifier in signature matches value in pass.json</li>
+                <li><i data-bind="css: teamIdentifierStyle"></i>TeamIdentifier in signature matches value in pass.json</li>
+            </ul>
+        </div>
         <div class="ui negative message" data-bind="visible: !processedSuccessfully()" style="display: none;">
             Failed to process the pkpass file.
         </div>
@@ -174,12 +193,23 @@
                             self.processedSuccessfully(true);
                             self.hasManifest(jsonResponse.hasManifest);
                             self.hasPass(jsonResponse.hasPass);
-                            self.hasSignature(jsonResponse.hasSignature);
+                            self.hasIcon1x(jsonResponse.HasIcon1x);
+                            self.hasIcon2x(jsonResponse.HasIcon2x);
+                            self.hasIcon3x(jsonResponse.HasIcon3x);
+
+                            self.hasPassTypeIdentifier(result.HasPassTypeIdentifier);
+                            self.hasTeamIdentifier(result.HasTeamIdentifier);
+                            self.hasDescription(result.HasDescription);
+                            self.hasFormatVersion(result.HasFormatVersion);
+                            self.hasSerialNumber(result.HasSerialNumber);
+                            self.hasOrganizationName(result.HasOrganizationName); 
+
                             self.signedByApple(jsonResponse.signedByApple);
                             self.hasMatchingPassTypeIdentifier(jsonResponse.passTypeIdentifierMatches);
                             self.hasMatchingTeamIdentifier(jsonResponse.teamIdentifierMatches);
                             self.signatureExpirationDate(jsonResponse.signatureExpirationDate);
                             self.hasSignatureExpired(jsonResponse.hasSignatureExpired);
+
                         } else {
                             self.processedSuccessfully(false);
                         }
@@ -208,6 +238,28 @@
             self.signatureStyle = ko.computed(function () {
                 return self.getStyle(self.hasSignature());
             });
+
+            self.hasIcon1x = ko.observable(false);
+            self.icon1xStyle = ko.computed(function () {
+                return self.getStyle(self.hasIcon1x());
+            });
+
+            self.hasIcon2x = ko.observable(false);
+            self.icon2xStyle = ko.computed(function () {
+                return self.getStyle(self.hasIcon2x());
+            });
+
+            self.hasIcon3x = ko.observable(false);
+            self.icon3xStyle = ko.computed(function () {
+                return self.getStyle(self.hasIcon3x());
+            });
+
+            self.hasPassTypeIdentifier = ko.observable(false);
+            self.hasTeamIdentifier = ko.observable(false);
+            self.hasDescription = ko.observable(false);
+            self.hasFormatVersion = ko.observable(false);
+            self.hasSerialNumber = ko.observable(false);
+            self.hasOrganizationName = ko.observable(false);
 
             self.hasMatchingPassTypeIdentifier = ko.observable(false);
             self.passTypeIdentifierStyle = ko.computed(function () {

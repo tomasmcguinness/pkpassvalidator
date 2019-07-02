@@ -57,8 +57,24 @@ namespace PassValidator.Web.Validation
                                     var file = ms.ToArray();
 
                                     var jsonObject = JObject.Parse(Encoding.UTF8.GetString(file));
+
                                     passTypeIdentifier = jsonObject["passTypeIdentifier"].Value<string>();
+                                    result.HasPassTypeIdentifier = !string.IsNullOrWhiteSpace(passTypeIdentifier);
+
                                     teamIdentifier = jsonObject["teamIdentifier"].Value<string>();
+                                    result.HasTeamIdentifier = !string.IsNullOrWhiteSpace(teamIdentifier);
+
+                                    var description = jsonObject["description"].Value<string>();
+                                    result.HasDescription = !string.IsNullOrWhiteSpace(description);
+
+                                    var formatVersion = jsonObject["formatVersion"].Value<int>();
+                                    result.HasFormatVersion = formatVersion == 1;
+
+                                    var serialNumber = jsonObject["serialNumber"].Value<string>();
+                                    result.HasSerialNumber = !string.IsNullOrWhiteSpace(serialNumber);
+
+                                    var organizationName = jsonObject["organizationName"].Value<string>();
+                                    result.HasOrganizationName = !string.IsNullOrWhiteSpace(organizationName);
 
                                     if (jsonObject.ContainsKey("expirationDate"))
                                     {
@@ -82,6 +98,21 @@ namespace PassValidator.Web.Validation
                                 }
 
                             }
+                        }
+
+                        if (e.Name.ToLower().Equals("icon.png"))
+                        {
+                            result.HasIcon1x = true;
+                        }
+
+                        if (e.Name.ToLower().Equals("icon@2x.png"))
+                        {
+                            result.Has2xIcon = true;
+                        }
+
+                        if (e.Name.ToLower().Equals("icon@3x.png"))
+                        {
+                            result.Has3xIcon = true;
                         }
                     }
                 }

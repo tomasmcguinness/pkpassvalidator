@@ -18,5 +18,14 @@ namespace PassValidator.Web.Validation
         public bool SignedByApple { get; internal set; }
         public bool HasSignatureExpired { get; internal set; }
         public string SignatureExpirationDate { get; internal set; }
+        public bool Has3xIcon { get; internal set; }
+        public bool Has2xIcon { get; internal set; }
+        public bool HasIcon1x { get; internal set; }
+        public bool HasPassTypeIdentifier { get; internal set; }
+        public bool HasTeamIdentifier { get; internal set; }
+        public bool HasDescription { get; internal set; }
+        public bool HasFormatVersion { get; internal set; }
+        public bool HasSerialNumber { get; internal set; }
+        public bool HasOrganizationName { get; internal set; }
     }
 }

@@ -72,15 +72,17 @@
     </p>
     <h3>What does it do?</h3>
     <p>
-        Your file is uploaded and unzipped into memory. Each of the files is examied and checked to ensure it meets Apple's requirements. At present, the following things will be checked:
+        Your file is uploaded and unzipped into memory. Each of the files is examined and checked to ensure it meets Apple's requirements. At present, the following things will be checked:
         <ul>
-            <li>Manifest.json, pass.json and signature file are present</li>
-            <li>Your PassTypeIdentifier and TeamIdentifier in your pass.json matches your certificate</li>
+            <li>Manifest.json, pass.json, signature and icon.png files are present</li>
+            <li>The required standard keys are present</li>
+            <li>The Associated App keys are checked if present</li>
             <li>Your pass is signed by Apple and the signature is valid</li>
+            <li>Your PassTypeIdentifier and TeamIdentifier in your pass.json matches your certificate</li>
         </ul>
     </p>
     <p>
-        Your file is never saved and will exist in memory.
+        Your file is <b>never</b> saved and exists in memory long enough to validate.
     </p>
     <p>
         <input id="inputFile" type="file" accept=".pkpass" name="passFile" />
@@ -148,8 +150,9 @@
         <li><a class="ui small blue label">14th August 2018</a> - Added check to ensure signature is in date</li>
         <li><a class="ui small blue label">25th July 2018</a> - First release with basic siganture checks</li>
     </ul>
-    <h2>Checks to be added</h2>
+    <h2>Checks that need to be added</h2>
     <ul>
+        <li>Image sizes are correct</li>
         <li>Ensure webservice url is valid and https</li>
         <li>Ensure dates are valid ISO 8601</li>
     </ul>

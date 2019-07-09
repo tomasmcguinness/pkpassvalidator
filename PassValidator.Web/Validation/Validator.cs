@@ -75,7 +75,7 @@ namespace PassValidator.Web.Validation
                                     var serialNumber = GetKeyStringValue(jsonObject, "serialNumber");
                                     result.HasSerialNumber = !string.IsNullOrWhiteSpace(serialNumber);
 
-                                    var organizationName = GetKeyStringValue(jsonObject, "organisationName");
+                                    var organizationName = GetKeyStringValue(jsonObject, "organizationName");
                                     result.HasOrganizationName = !string.IsNullOrWhiteSpace(organizationName);
 
                                     if (jsonObject.ContainsKey("appLaunchURL"))

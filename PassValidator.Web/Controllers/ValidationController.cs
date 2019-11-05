@@ -31,7 +31,14 @@ namespace WebApplication2.Controllers
 
         private async Task LogResultAsync(ValidationResult result)
         {
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("APPSETTING_table_storage"));
+            var connectionString = Environment.GetEnvironmentVariable("APPSETTING_table_storage");
+
+            if(connectionString == null)
+            {
+                return;
+            }
+
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
             CloudTable table = tableClient.GetTableReference("validations");
 

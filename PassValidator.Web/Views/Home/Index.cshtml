@@ -126,7 +126,10 @@
             <h3>Signature</h3>
             <ul>
                 <li><i data-bind="css: getStyle(signedByApple())"></i>Signed by Apple</li>
-                <li><i data-bind="css: getStyle(!hasSignatureExpired())"></i>Signature not expired (<span data-bind="text: signatureExpirationDate"></span>)</li>
+                <li><i data-bind="css: getStyle(wwdrCertificateSubjectMatches())"></i>WWDR Certificate Subject</li>
+                <li><i data-bind="css: getStyle(!wwdrCertificateExpired())"></i>WWDR Certificate in date</li>
+                <li><i data-bind="css: getStyle(signedByApple())"></i>Signed by Apple</li>
+                <li><i data-bind="css: getStyle(!hasSignatureExpired())"></i>Signature in date (<span data-bind="text: signatureExpirationDate"></span>)</li>
                 <li><i data-bind="css: getStyle(hasMatchingPassTypeIdentifier())"></i>PassTypeIdentifier in signature matches value in pass.json</li>
                 <li><i data-bind="css: getStyle(hasMatchingTeamIdentifier())"></i>TeamIdentifier in signature matches value in pass.json</li>
             </ul>
@@ -145,6 +148,7 @@
     </p>
     <h2>Release History</h2>
     <ul>
+        <li><a class="ui small blue label">5th November 2019</a> - Improved Signature validation</li>
         <li><a class="ui small blue label">4th July 2019</a> - Added custom domain pkpassvalidator.com</li>
         <li><a class="ui small blue label">2nd July 2019</a> - Icon files checked. Standard and Associated App keys checked</li>
         <li><a class="ui small blue label">2nd October 2018</a> - Updating validation to handle different order of files</li>
@@ -173,7 +177,6 @@
             self.processedSuccessfully = ko.observable(false);
 
             self.submitForValidation = function () {
-
 
                 var fileInput = document.getElementById('inputFile');
 
@@ -223,6 +226,9 @@
                             self.hasAppLaunchUrl(jsonResponse.hasAppLaunchUrl);
                             self.hasAssociatedStoreIdentifiers(jsonResponse.hasAssociatedStoreIdentifiers);
 
+                            self.wwdrCertificateExpired(jsonResponse.wwdrCertificateExpired);
+                            self.wwdrCertificateSubjectMatches(jsonResponse.wwdrCertificateSubjectMatches);
+
                             self.signedByApple(jsonResponse.signedByApple);
                             self.hasMatchingPassTypeIdentifier(jsonResponse.passTypeIdentifierMatches);
                             self.hasMatchingTeamIdentifier(jsonResponse.teamIdentifierMatches);
@@ -259,6 +265,9 @@
 
             self.hasAppLaunchUrl = ko.observable(false);
             self.hasAssociatedStoreIdentifiers = ko.observable(false);
+
+            self.wwdrCertificateExpired = ko.observable(false);
+            self.wwdrCertificateSubjectMatches = ko.observable(false);
 
             self.hasMatchingPassTypeIdentifier = ko.observable(false);
             self.hasMatchingTeamIdentifier = ko.observable(false);

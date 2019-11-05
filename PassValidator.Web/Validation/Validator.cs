@@ -137,7 +137,14 @@ namespace PassValidator.Web.Validation
 
             var signer = signedCms.SignerInfos[0];
 
-            result.SignedByApple = signer.Certificate.IssuerName.Name == "CN=Apple Worldwide Developer Relations Certification Authority, OU=Apple Worldwide Developer Relations, O=Apple Inc., C=US";
+            var wwdrCertSubject = "CN=Apple Worldwide Developer Relations Certification Authority, OU=Apple Worldwide Developer Relations, O=Apple Inc., C=US";
+
+            var appleWWDRCertificate = signedCms.Certificates[0];
+
+            result.WWDRCertificateExpired = appleWWDRCertificate.NotAfter < DateTime.UtcNow;
+            result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Subject == wwdrCertSubject;
+
+            result.SignedByApple = signer.Certificate.IssuerName.Name == wwdrCertSubject;
 
 
             if (result.SignedByApple)

@@ -39,5 +39,7 @@
         public bool HasAppLaunchUrl { get; set; }
 
         public bool HasAssociatedStoreIdentifiers { get; set; }
+        public bool WWDRCertificateExpired { get; internal set; }
+        public bool WWDRCertificateSubjectMatches { get; internal set; }
     }
 }

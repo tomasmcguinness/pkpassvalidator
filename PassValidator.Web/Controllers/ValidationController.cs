@@ -33,7 +33,7 @@ namespace WebApplication2.Controllers
         {
             var connectionString = Environment.GetEnvironmentVariable("APPSETTING_table_storage");
 
-            if(connectionString == null)
+            if (connectionString == null)
             {
                 return;
             }
@@ -53,7 +53,11 @@ namespace WebApplication2.Controllers
                                          !result.HasSerialNumber ||
                                          !result.HasTeamIdentifier;
 
-            entity.InvalidSignature = result.HasSignatureExpired || !result.SignedByApple;
+            entity.InvalidSignature = result.HasSignatureExpired || !result.SignedByApple || result.WWDRCertificateExpired || !result.WWDRCertificateSubjectMatches;
+
+            entity.MissingIconFile = !result.HasIcon1x || !result.Has2xIcon || !result.Has3xIcon;
+
+            entity.InvalidUpdateKeys = (result.HasWebServiceUrl || result.HasAuthenticationToken) && !result.WebServiceUrlIsHttps && !result.AuthenticationTokenIsCorrectLength;
 
             TableOperation insert = TableOperation.Insert(entity);
 
@@ -81,6 +85,10 @@ namespace WebApplication2.Controllers
             public bool MissingFiles { get; set; }
 
             public bool MissingStandardKeys { get; set; }
+
+            public bool MissingIconFile { get; set; }
+
+            public bool InvalidUpdateKeys { get; set; }
         }
     }
 }

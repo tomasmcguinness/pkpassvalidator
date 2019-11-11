@@ -83,6 +83,22 @@ namespace PassValidator.Web.Validation
                                         result.HasAppLaunchUrl = true;
                                         result.HasAssociatedStoreIdentifiers = jsonObject.ContainsKey("associatedStoreIdentifiers");
                                     }
+
+                                    if (jsonObject.ContainsKey("webServiceURL"))
+                                    {
+                                        result.HasWebServiceUrl = true;
+
+                                        var webServiceUrl = GetKeyStringValue(jsonObject, "webServiceURL");
+                                        result.WebServiceUrlIsHttps = webServiceUrl.ToLower().StartsWith("https://");
+                                    }
+
+                                    if (jsonObject.ContainsKey("authenticationToken"))
+                                    {
+                                        result.HasAuthenticationToken = true;
+
+                                        var authenticationToken = GetKeyStringValue(jsonObject, "authenticationToken");
+                                        result.AuthenticationTokenIsCorrectLength = authenticationToken.Length >= 16;
+                                    }
                                 }
                             }
                         }

@@ -123,6 +123,16 @@
                 </ul>
             </div>
 
+            <div data-bind="visible: hasWebServiceUrl() || hasAuthenticationToken()">
+                <h3>Updates</h3>
+                <ul>
+                    <li><i data-bind="css: getStyle(hasWebServiceUrl())"></i>Includes WebServiceUrl</li>
+                    <li><i data-bind="css: getStyle(webServiceUrlIsHttps())"></i>WebServiceUrl is HTTPS</li>
+                    <li><i data-bind="css: getStyle(hasAuthenticationToken())"></i>Includes AuthenticationToken</li>
+                    <li><i data-bind="css: getStyle(authenticationTokenIsCorrectLength())"></i>AuthenticationToken is 16 characters or more</li>
+                </ul>
+            </div>
+
             <h3>Signature</h3>
             <ul>
                 <li><i data-bind="css: getStyle(signedByApple())"></i>Signed by Apple</li>
@@ -148,6 +158,7 @@
     </p>
     <h2>Release History</h2>
     <ul>
+        <li><a class="ui small blue label">11th November 2019</a> - Update key (auth token and webserviceUrl) validation</li>
         <li><a class="ui small blue label">5th November 2019</a> - Improved Signature validation</li>
         <li><a class="ui small blue label">4th July 2019</a> - Added custom domain pkpassvalidator.com</li>
         <li><a class="ui small blue label">2nd July 2019</a> - Icon files checked. Standard and Associated App keys checked</li>
@@ -235,6 +246,11 @@
                             self.signatureExpirationDate(jsonResponse.signatureExpirationDate);
                             self.hasSignatureExpired(jsonResponse.hasSignatureExpired);
 
+                            self.hasAuthenticationToken(jsonResponse.hasAuthenticationToken);
+                            self.authenticationTokenIsCorrectLength(jsonResponse.authenticationTokenIsCorrectLength);
+                            self.hasWebServiceUrl(jsonResponse.hasWebServiceUrl);
+                            self.webServiceUrlIsHttps(jsonResponse.webServiceUrlIsHttps);
+
                         } else {
                             self.processedSuccessfully(false);
                         }
@@ -274,6 +290,12 @@
             self.signedByApple = ko.observable(false);
             self.signatureExpirationDate = ko.observable(null);
             self.hasSignatureExpired = ko.observable(false);
+
+            self.hasAuthenticationToken = ko.observable(false);
+            self.authenticationTokenIsCorrectLength = ko.observable(false);
+            self.hasWebServiceUrl = ko.observable(false);
+            self.webServiceUrlIsHttps = ko.observable(false);
+
         }
 
         var viewModel = new Model();

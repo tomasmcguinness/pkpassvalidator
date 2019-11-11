@@ -39,7 +39,17 @@
         public bool HasAppLaunchUrl { get; set; }
 
         public bool HasAssociatedStoreIdentifiers { get; set; }
-        public bool WWDRCertificateExpired { get; internal set; }
-        public bool WWDRCertificateSubjectMatches { get; internal set; }
+
+        public bool WWDRCertificateExpired { get; set; }
+
+        public bool WWDRCertificateSubjectMatches { get; set; }
+
+        public bool HasAuthenticationToken { get; set; }
+
+        public bool AuthenticationTokenIsCorrectLength { get; set; }
+
+        public bool HasWebServiceUrl { get; set; }
+
+        public bool WebServiceUrlIsHttps { get; set; }
     }
 }

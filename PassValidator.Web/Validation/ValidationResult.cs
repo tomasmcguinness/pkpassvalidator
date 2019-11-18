@@ -18,9 +18,9 @@
 
         public string SignatureExpirationDate { get; set; }
 
-        public bool Has3xIcon { get; set; }
+        public bool HasIcon3x { get; set; }
 
-        public bool Has2xIcon { get; set; }
+        public bool HasIcon2x { get; set; }
 
         public bool HasIcon1x { get; set; }
 

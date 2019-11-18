@@ -126,12 +126,12 @@ namespace PassValidator.Web.Validation
 
                         if (e.Name.ToLower().Equals("icon@2x.png"))
                         {
-                            result.Has2xIcon = true;
+                            result.HasIcon2x = true;
                         }
 
                         if (e.Name.ToLower().Equals("icon@3x.png"))
                         {
-                            result.Has3xIcon = true;
+                            result.HasIcon3x = true;
                         }
                     }
                 }

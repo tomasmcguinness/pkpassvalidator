@@ -55,7 +55,7 @@ namespace WebApplication2.Controllers
 
             entity.InvalidSignature = result.HasSignatureExpired || !result.SignedByApple || result.WWDRCertificateExpired || !result.WWDRCertificateSubjectMatches;
 
-            entity.MissingIconFile = !result.HasIcon1x || !result.Has2xIcon || !result.Has3xIcon;
+            entity.MissingIconFile = !result.HasIcon1x || !result.HasIcon2x || !result.HasIcon3x;
 
             entity.InvalidUpdateKeys = (result.HasWebServiceUrl || result.HasAuthenticationToken) && !result.WebServiceUrlIsHttps && !result.AuthenticationTokenIsCorrectLength;
 

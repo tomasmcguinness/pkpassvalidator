@@ -101,6 +101,8 @@
                 <li><i data-bind="css: getStyle(hasPass())"></i>Has pass.json</li>
                 <li><i data-bind="css: getStyle(hasSignature())"></i>Has signature file</li>
                 <li><i data-bind="css: getStyle(hasIcon1x())"></i>Has icon.png file</li>
+                <li><i data-bind="css: getStyle(hasIcon2x())"></i>Has icon@2x.png file</li>
+                <li><i data-bind="css: getStyle(hasIcon3x())"></i>Has icon@3x.png file</li>
             </ul>
 
             <h3>Standard Keys</h3>
@@ -160,6 +162,7 @@
     </p>
     <h2>Release History</h2>
     <ul>
+        <li><a class="ui small blue label">18th November 2019</a> - Fixed bug in detection of missing icon files</li>
         <li><a class="ui small blue label">11th November 2019</a> - Update key (auth token and webserviceUrl) validation</li>
         <li><a class="ui small blue label">5th November 2019</a> - Improved Signature validation</li>
         <li><a class="ui small blue label">4th July 2019</a> - Added custom domain pkpassvalidator.com</li>

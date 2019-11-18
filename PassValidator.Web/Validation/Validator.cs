@@ -28,7 +28,7 @@ namespace PassValidator.Web.Validation
                 {
                     foreach (var e in archive.Entries)
                     {
-                        if (e.Name.ToLower().Equals("manifest.json"))
+                        if (e.FullName.ToLower().Equals("manifest.json"))
                         {
                             result.HasManifest = true;
 
@@ -43,7 +43,7 @@ namespace PassValidator.Web.Validation
                             }
                         }
 
-                        if (e.Name.ToLower().Equals("pass.json"))
+                        if (e.FullName.ToLower().Equals("pass.json"))
                         {
                             result.HasPass = true;
 
@@ -103,7 +103,7 @@ namespace PassValidator.Web.Validation
                             }
                         }
 
-                        if (e.Name.ToLower().Equals("signature"))
+                        if (e.FullName.ToLower().Equals("signature"))
                         {
                             result.HasSignature = true;
 
@@ -119,17 +119,17 @@ namespace PassValidator.Web.Validation
                             }
                         }
 
-                        if (e.Name.ToLower().Equals("icon.png"))
+                        if (e.FullName.ToLower().Equals("icon.png"))
                         {
                             result.HasIcon1x = true;
                         }
 
-                        if (e.Name.ToLower().Equals("icon@2x.png"))
+                        if (e.FullName.ToLower().Equals("icon@2x.png"))
                         {
                             result.HasIcon2x = true;
                         }
 
-                        if (e.Name.ToLower().Equals("icon@3x.png"))
+                        if (e.FullName.ToLower().Equals("icon@3x.png"))
                         {
                             result.HasIcon3x = true;
                         }
@@ -137,55 +137,58 @@ namespace PassValidator.Web.Validation
                 }
             }
 
-            ContentInfo contentInfo = new ContentInfo(manifestFile);
-            SignedCms signedCms = new SignedCms(contentInfo, true);
-
-            signedCms.Decode(signatureFile);
-
-            try
+            if (result.HasManifest)
             {
-                signedCms.CheckSignature(true);
-            }
-            catch
-            {
+                ContentInfo contentInfo = new ContentInfo(manifestFile);
+                SignedCms signedCms = new SignedCms(contentInfo, true);
 
-            }
+                signedCms.Decode(signatureFile);
 
-            var signer = signedCms.SignerInfos[0];
-
-            var wwdrCertSubject = "CN=Apple Worldwide Developer Relations Certification Authority, OU=Apple Worldwide Developer Relations, O=Apple Inc., C=US";
-
-            var appleWWDRCertificate = signedCms.Certificates[0];
-
-            result.WWDRCertificateExpired = appleWWDRCertificate.NotAfter < DateTime.UtcNow;
-            result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Subject == wwdrCertSubject;
-
-            result.SignedByApple = signer.Certificate.IssuerName.Name == wwdrCertSubject;
-
-
-            if (result.SignedByApple)
-            {
-                Debug.WriteLine(signer.Certificate);
-
-                var cnValues = Parse(signer.Certificate.Subject, "CN");
-                var ouValues = Parse(signer.Certificate.Subject, "OU");
-
-                var passTypeIdentifierSubject = cnValues[0];
-                signaturePassTypeIdentifier = passTypeIdentifierSubject.Replace("Pass Type ID: ", "");
-
-                if (ouValues != null && ouValues.Count > 0)
+                try
                 {
-                    signatureTeamIdentifier = ouValues[0];
+                    signedCms.CheckSignature(true);
+                }
+                catch
+                {
+
                 }
 
-                Debug.WriteLine(signer.Certificate.IssuerName.Name);
+                var signer = signedCms.SignerInfos[0];
 
-                result.HasSignatureExpired = signer.Certificate.NotAfter < DateTime.UtcNow;
-                result.SignatureExpirationDate = signer.Certificate.NotAfter.ToString("yyyy-MM-dd HH:mm:ss");
+                var wwdrCertSubject = "CN=Apple Worldwide Developer Relations Certification Authority, OU=Apple Worldwide Developer Relations, O=Apple Inc., C=US";
+
+                var appleWWDRCertificate = signedCms.Certificates[0];
+
+                result.WWDRCertificateExpired = appleWWDRCertificate.NotAfter < DateTime.UtcNow;
+                result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Subject == wwdrCertSubject;
+
+                result.SignedByApple = signer.Certificate.IssuerName.Name == wwdrCertSubject;
+
+
+                if (result.SignedByApple)
+                {
+                    Debug.WriteLine(signer.Certificate);
+
+                    var cnValues = Parse(signer.Certificate.Subject, "CN");
+                    var ouValues = Parse(signer.Certificate.Subject, "OU");
+
+                    var passTypeIdentifierSubject = cnValues[0];
+                    signaturePassTypeIdentifier = passTypeIdentifierSubject.Replace("Pass Type ID: ", "");
+
+                    if (ouValues != null && ouValues.Count > 0)
+                    {
+                        signatureTeamIdentifier = ouValues[0];
+                    }
+
+                    Debug.WriteLine(signer.Certificate.IssuerName.Name);
+
+                    result.HasSignatureExpired = signer.Certificate.NotAfter < DateTime.UtcNow;
+                    result.SignatureExpirationDate = signer.Certificate.NotAfter.ToString("yyyy-MM-dd HH:mm:ss");
+                }
+
+                result.PassTypeIdentifierMatches = passTypeIdentifier == signaturePassTypeIdentifier;
+                result.TeamIdentifierMatches = teamIdentifier == signatureTeamIdentifier;
             }
-
-            result.PassTypeIdentifierMatches = passTypeIdentifier == signaturePassTypeIdentifier;
-            result.TeamIdentifierMatches = teamIdentifier == signatureTeamIdentifier;
 
             return result;
         }

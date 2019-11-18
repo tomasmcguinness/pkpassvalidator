@@ -14,7 +14,7 @@
 
         public bool SignedByApple { get; set; }
 
-        public bool HasSignatureExpired { get; set; }
+        public bool HasSignatureExpired { get; set; } = true;
 
         public string SignatureExpirationDate { get; set; }
 
@@ -40,7 +40,7 @@
 
         public bool HasAssociatedStoreIdentifiers { get; set; }
 
-        public bool WWDRCertificateExpired { get; set; }
+        public bool WWDRCertificateExpired { get; set; } = true;
 
         public bool WWDRCertificateSubjectMatches { get; set; }
 

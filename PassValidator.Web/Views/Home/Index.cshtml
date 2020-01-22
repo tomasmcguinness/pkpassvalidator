@@ -111,6 +111,7 @@
                 <li><i data-bind="css: getStyle(hasOrganizationName())"></i>Has organizationName</li>
                 <li><i data-bind="css: getStyle(hasPassTypeIdentifier())"></i>Has passTypeIdentifier</li>
                 <li><i data-bind="css: getStyle(hasSerialNumber())"></i>Has serialNumber</li>
+                <li><i data-bind="css: getStyle(hasSerialNumberOfCorrectLength())"></i>SerialNumber is long enough (16 chars or more) </li>
                 <li><i data-bind="css: getStyle(hasTeamIdentifier())"></i>Has teamIdentifier</li>
             </ul>
 
@@ -236,6 +237,7 @@
                             self.hasDescription(jsonResponse.hasDescription);
                             self.hasFormatVersion(jsonResponse.hasFormatVersion);
                             self.hasSerialNumber(jsonResponse.hasSerialNumber);
+                            self.hasSerialNumberOfCorrectLength(jsonResponse.hasSerialNumberOfCorrectLength);
                             self.hasOrganizationName(jsonResponse.hasOrganizationName);
 
                             self.hasAppLaunchUrl(jsonResponse.hasAppLaunchUrl);

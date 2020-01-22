@@ -75,6 +75,11 @@ namespace PassValidator.Web.Validation
                                     var serialNumber = GetKeyStringValue(jsonObject, "serialNumber");
                                     result.HasSerialNumber = !string.IsNullOrWhiteSpace(serialNumber);
 
+                                    if (result.HasSerialNumber)
+                                    {
+                                        result.hasSerialNumberOfCorrectLength = serialNumber.Length >= 16;
+                                    }
+
                                     var organizationName = GetKeyStringValue(jsonObject, "organizationName");
                                     result.HasOrganizationName = !string.IsNullOrWhiteSpace(organizationName);
 

@@ -34,6 +34,7 @@
 
         public bool HasSerialNumber { get; set; }
 
+        public bool hasSerialNumberOfCorrectLength { get; set; }
         public bool HasOrganizationName { get; set; }
 
         public bool HasAppLaunchUrl { get; set; }

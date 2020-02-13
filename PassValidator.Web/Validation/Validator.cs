@@ -165,15 +165,13 @@ namespace PassValidator.Web.Validation
                 var appleWWDRCertificate = signedCms.Certificates[0];
 
                 result.WWDRCertificateExpired = appleWWDRCertificate.NotAfter < DateTime.UtcNow;
-                result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Subject == wwdrCertSubject;
+                result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Issuer == wwdrCertSubject;
 
                 result.SignedByApple = signer.Certificate.IssuerName.Name == wwdrCertSubject;
 
 
                 if (result.SignedByApple)
                 {
-                    Debug.WriteLine(signer.Certificate);
-
                     var cnValues = Parse(signer.Certificate.Subject, "CN");
                     var ouValues = Parse(signer.Certificate.Subject, "OU");
 
@@ -184,8 +182,6 @@ namespace PassValidator.Web.Validation
                     {
                         signatureTeamIdentifier = ouValues[0];
                     }
-
-                    Debug.WriteLine(signer.Certificate.IssuerName.Name);
 
                     result.HasSignatureExpired = signer.Certificate.NotAfter < DateTime.UtcNow;
                     result.SignatureExpirationDate = signer.Certificate.NotAfter.ToString("yyyy-MM-dd HH:mm:ss");

@@ -164,6 +164,14 @@ namespace PassValidator.Web.Validation
 
                 var appleWWDRCertificate = signedCms.Certificates[0];
 
+                foreach(var extension in appleWWDRCertificate.Extensions)
+                {
+                    Debug.WriteLine($"{extension.Oid.Value} {BitConverter.ToString(extension.RawData)}");
+                }
+
+                //1.2.840.113635.100.6.1.16 is the OID of the problematic part I think. 
+                //
+
                 result.WWDRCertificateExpired = appleWWDRCertificate.NotAfter < DateTime.UtcNow;
                 result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Subject == wwdrCertSubject;
 
@@ -172,8 +180,6 @@ namespace PassValidator.Web.Validation
 
                 if (result.SignedByApple)
                 {
-                    Debug.WriteLine(signer.Certificate);
-
                     var cnValues = Parse(signer.Certificate.Subject, "CN");
                     var ouValues = Parse(signer.Certificate.Subject, "OU");
 
@@ -184,8 +190,6 @@ namespace PassValidator.Web.Validation
                     {
                         signatureTeamIdentifier = ouValues[0];
                     }
-
-                    Debug.WriteLine(signer.Certificate.IssuerName.Name);
 
                     result.HasSignatureExpired = signer.Certificate.NotAfter < DateTime.UtcNow;
                     result.SignatureExpirationDate = signer.Certificate.NotAfter.ToString("yyyy-MM-dd HH:mm:ss");

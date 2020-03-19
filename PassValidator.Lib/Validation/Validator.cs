@@ -1,13 +1,12 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography.Pkcs;
 using System.Text;
 
-namespace PassValidator.Web.Validation
+namespace PassValidator.Lib.Validation
 {
     public class Validator
     {

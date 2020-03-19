@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
-using PassValidator.Web.Validation;
+using PassValidator.Lib.Validation;
 using System;
 using System.IO;
 using System.Threading.Tasks;

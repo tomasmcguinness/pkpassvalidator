@@ -1,4 +1,4 @@
-﻿namespace PassValidator.Web.Validation
+﻿namespace PassValidator.Lib.Validation
 {
     public class ValidationResult
     {

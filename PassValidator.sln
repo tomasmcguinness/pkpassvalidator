@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.29020.237
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PassValidator.Web", "PassValidator.Web\PassValidator.Web.csproj", "{2C7368F7-8E65-4BB4-A0B3-62F3AF26C5D2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PassValidator.API", "PassValidator.API\PassValidator.API.csproj", "{09D8CCB1-A070-4FB8-8FF3-DA9A27796D42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PassValidator.Lib", "PassValidator.Lib\PassValidator.Lib.csproj", "{4C9BB113-D886-4B3F-9696-8F7513FCBAEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{2C7368F7-8E65-4BB4-A0B3-62F3AF26C5D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C7368F7-8E65-4BB4-A0B3-62F3AF26C5D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C7368F7-8E65-4BB4-A0B3-62F3AF26C5D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09D8CCB1-A070-4FB8-8FF3-DA9A27796D42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09D8CCB1-A070-4FB8-8FF3-DA9A27796D42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09D8CCB1-A070-4FB8-8FF3-DA9A27796D42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09D8CCB1-A070-4FB8-8FF3-DA9A27796D42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C9BB113-D886-4B3F-9696-8F7513FCBAEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C9BB113-D886-4B3F-9696-8F7513FCBAEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C9BB113-D886-4B3F-9696-8F7513FCBAEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C9BB113-D886-4B3F-9696-8F7513FCBAEC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

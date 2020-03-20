@@ -14,12 +14,24 @@ namespace PassValidator.API.Controllers
         {
             try
             {
-                return Ok(new Validator().Validate(
-                System.Convert.FromBase64String(pkPass.EncodedBytes)));
+                return Ok(new 
+                { 
+                    data = new Validator().Validate(Convert.FromBase64String(pkPass.EncodedBytes)) 
+                });
             }
             catch(Exception ex) when (ex is FormatException || ex is ArgumentNullException)
             {
-                return BadRequest(new Error("Payload missing or invalid. Check if base64 encoded."));
+                return BadRequest(new Error(
+                    "validation_error",
+                    "Payload missing or invalid. Check if base64 encoded.",
+                    400));
+            }
+            catch
+            {
+                return BadRequest(new Error(
+                    "payload_error",
+                    "Payload is invalid.",
+                    422));
             }
             
         }

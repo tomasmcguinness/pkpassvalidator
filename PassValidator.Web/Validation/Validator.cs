@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography.Pkcs;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace PassValidator.Web.Validation
@@ -100,12 +101,20 @@ namespace PassValidator.Web.Validation
                                     if (jsonObject.ContainsKey("authenticationToken"))
                                     {
                                         result.HasAuthenticationToken = true;
+                                    }
 
-                                        var authenticationToken = GetKeyStringValue(jsonObject, "authenticationToken");
-                                        result.AuthenticationTokenIsCorrectLength = authenticationToken.Length >= 16;
+                                    if (result.HasAuthenticationToken && !result.HasWebServiceUrl)
+                                    {
+                                        result.AuthenticationTokenRequiresWebServiceUrl = true;
+                                    }
+
+                                    if (result.HasWebServiceUrl && !result.HasAuthenticationToken)
+                                    {
+                                        result.WebServiceUrlRequiresAuthenticationToken = true;
                                     }
                                 }
                             }
+
                         }
 
                         if (e.FullName.ToLower().Equals("signature"))
@@ -120,7 +129,6 @@ namespace PassValidator.Web.Validation
                                     ms.Position = 0;
                                     signatureFile = ms.ToArray();
                                 }
-
                             }
                         }
 
@@ -162,21 +170,54 @@ namespace PassValidator.Web.Validation
 
                 var wwdrCertSubject = "CN=Apple Worldwide Developer Relations Certification Authority, OU=Apple Worldwide Developer Relations, O=Apple Inc., C=US";
 
-                var appleWWDRCertificate = signedCms.Certificates[0];
+                // There are two certificates attached. One is the PassType certificate. One is the WWDR certificate.
+                //
+                X509Certificate2 appleWWDRCertificate = null;
+                X509Certificate2 passKitCertificate = null;
 
-                foreach(var extension in appleWWDRCertificate.Extensions)
+                foreach (var cert in signedCms.Certificates)
                 {
-                    Debug.WriteLine($"{extension.Oid.Value} {BitConverter.ToString(extension.RawData)}");
+                    if (cert.IssuerName.Name == "CN=Apple Root CA, OU=Apple Certification Authority, O=Apple Inc., C=US")
+                    {
+                        // This is the WWDR certificate.
+                        appleWWDRCertificate = cert;
+                    }
+                    else if (cert.IssuerName.Name == "CN=Apple Worldwide Developer Relations Certification Authority, OU=Apple Worldwide Developer Relations, O=Apple Inc., C=US")
+                    {
+                        passKitCertificate = cert;
+                    }
                 }
 
-                //1.2.840.113635.100.6.1.16 is the OID of the problematic part I think. 
-                //
+                if (passKitCertificate != null)
+                {
+                    result.PassKitCertificateFound = true;
 
-                result.WWDRCertificateExpired = appleWWDRCertificate.NotAfter < DateTime.UtcNow;
-                result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Subject == wwdrCertSubject;
+                    foreach (var extension in passKitCertificate.Extensions)
+                    {
+                        // 1.2.840.113635.100.6.1.16 is the OID of the problematic part I think.
+                        // This is an Apple custom extension (1.2.840.113635.100.6.1.16) and in good passes, 
+                        // the value matches the pass type identifier.
+                        //
+                        if (extension.Oid.Value == "1.2.840.113635.100.6.1.16")
+                        {
+                            var value = Encoding.ASCII.GetString(extension.RawData);
+                            value = value.Substring(2, value.Length - 2);
+
+                            result.PassKitCertificateNameCorrect = value == passTypeIdentifier;
+                        }
+                    }
+
+                    result.PassKitCertificateExpired = passKitCertificate.NotAfter < DateTime.UtcNow;
+                }
+
+                if (appleWWDRCertificate != null)
+                {
+                    result.WWDRCertificateFound = true;
+                    result.WWDRCertificateExpired = appleWWDRCertificate.NotAfter < DateTime.UtcNow;
+                    result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Subject == wwdrCertSubject;
+                }
 
                 result.SignedByApple = signer.Certificate.IssuerName.Name == wwdrCertSubject;
-
 
                 if (result.SignedByApple)
                 {

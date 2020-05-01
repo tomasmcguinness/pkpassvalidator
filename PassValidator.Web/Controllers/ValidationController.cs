@@ -53,11 +53,11 @@ namespace WebApplication2.Controllers
                                          !result.HasSerialNumber ||
                                          !result.HasTeamIdentifier;
 
-            entity.InvalidSignature = result.HasSignatureExpired || !result.SignedByApple || result.WWDRCertificateExpired || !result.WWDRCertificateSubjectMatches;
+            entity.InvalidSignature = result.HasSignatureExpired || !result.SignedByApple || result.WWDRCertificateExpired || !result.WWDRCertificateSubjectMatches || !result.PassKitCertificateNameCorrect;
 
             entity.MissingIconFile = !result.HasIcon1x || !result.HasIcon2x || !result.HasIcon3x;
 
-            entity.InvalidUpdateKeys = (result.HasWebServiceUrl || result.HasAuthenticationToken) && !result.WebServiceUrlIsHttps && !result.AuthenticationTokenIsCorrectLength;
+            entity.InvalidUpdateKeys = (result.HasWebServiceUrl || result.HasAuthenticationToken) && !result.WebServiceUrlIsHttps && !result.AuthenticationTokenRequiresWebServiceUrl || !result.WebServiceUrlRequiresAuthenticationToken;
 
             TableOperation insert = TableOperation.Insert(entity);
 

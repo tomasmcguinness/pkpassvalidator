@@ -111,7 +111,6 @@
                 <li><i data-bind="css: getStyle(hasOrganizationName())"></i>Has organizationName</li>
                 <li><i data-bind="css: getStyle(hasPassTypeIdentifier())"></i>Has passTypeIdentifier</li>
                 <li><i data-bind="css: getStyle(hasSerialNumber())"></i>Has serialNumber</li>
-                <li><i data-bind="css: getStyle(hasSerialNumberOfCorrectLength())"></i>SerialNumber is long enough (16 chars or more) </li>
                 <li><i data-bind="css: getStyle(hasTeamIdentifier())"></i>Has teamIdentifier</li>
             </ul>
 
@@ -133,19 +132,27 @@
                     <li><i data-bind="css: getStyle(hasWebServiceUrl())"></i>Includes WebServiceUrl</li>
                     <li><i data-bind="css: getStyle(webServiceUrlIsHttps())"></i>WebServiceUrl is HTTPS</li>
                     <li><i data-bind="css: getStyle(hasAuthenticationToken())"></i>Includes AuthenticationToken</li>
-                    <li><i data-bind="css: getStyle(authenticationTokenIsCorrectLength())"></i>AuthenticationToken is 16 characters or more</li>
+                    <li data-bind="visible: authenticationTokenRequiresWebServiceUrl"><i class="thumbs down outline icon"></i>AuthenticationToken present but no WebServiceUrl found</lidata-bind="visible:>
+                    <li data-bind="visible: webServiceUrlRequiresAuthenticationToken"><i class="thumbs down outline icon" ></i>WebServiceUrl requires an AuthenticationToken</lidata-bind="visible:>
                 </ul>
             </div>
 
             <h3>Signature</h3>
             <ul>
                 <li><i data-bind="css: getStyle(signedByApple())"></i>Signed by Apple</li>
-                <li><i data-bind="css: getStyle(wwdrCertificateSubjectMatches())"></i>WWDR Certificate Subject</li>
-                <li><i data-bind="css: getStyle(!wwdrCertificateExpired())"></i>WWDR Certificate in date</li>
-                <li><i data-bind="css: getStyle(signedByApple())"></i>Signed by Apple</li>
                 <li><i data-bind="css: getStyle(!hasSignatureExpired())"></i>Signature in date (<span data-bind="text: signatureExpirationDate"></span>)</li>
                 <li><i data-bind="css: getStyle(hasMatchingPassTypeIdentifier())"></i>PassTypeIdentifier in signature matches value in pass.json</li>
                 <li><i data-bind="css: getStyle(hasMatchingTeamIdentifier())"></i>TeamIdentifier in signature matches value in pass.json</li>
+            </ul>
+            <h3>WWDR Certificate</h3>
+            <ul>
+                <li><i data-bind="css: getStyle(wwdrCertificateSubjectMatches())"></i>WWDR Certificate Subject</li>
+                <li><i data-bind="css: getStyle(!wwdrCertificateExpired())"></i>WWDR Certificate in date</li>
+            </ul>
+            <h3>PassKit Certificate</h3>
+            <ul>
+                <li data-bind="visible: !passKitCertificateNameCorrect()"><i class="thumbs down outline icon"></i>PassKit Certificate has an incorrect value - <a href="https://github.com/tomasmcguinness/pkpassvalidator/wiki/PassKit-certificate-contains-an-incorrect-value" target="_blank">Read more here</a></li>
+                <li><i data-bind="css: getStyle(!passKitCertificateExpired())"></i>PassKit Certificate in date</li>
             </ul>
         </div>
         <div class="ui negative message" data-bind="visible: !processedSuccessfully()" style="display: none;">
@@ -243,19 +250,25 @@
                             self.hasAppLaunchUrl(jsonResponse.hasAppLaunchUrl);
                             self.hasAssociatedStoreIdentifiers(jsonResponse.hasAssociatedStoreIdentifiers);
 
-                            self.wwdrCertificateExpired(jsonResponse.wwdrCertificateExpired);
-                            self.wwdrCertificateSubjectMatches(jsonResponse.wwdrCertificateSubjectMatches);
-
                             self.signedByApple(jsonResponse.signedByApple);
                             self.hasMatchingPassTypeIdentifier(jsonResponse.passTypeIdentifierMatches);
                             self.hasMatchingTeamIdentifier(jsonResponse.teamIdentifierMatches);
                             self.signatureExpirationDate(jsonResponse.signatureExpirationDate);
                             self.hasSignatureExpired(jsonResponse.hasSignatureExpired);
+                            self.passKitCertificateFound(jsonResponse.passKitCertificateFound);
+                            self.wwdrCertificateFound(jsonResponse.wwdrCertificateFound);
+
+                            self.wwdrCertificateExpired(jsonResponse.wwdrCertificateExpired);
+                            self.wwdrCertificateSubjectMatches(jsonResponse.wwdrCertificateSubjectMatches);
+
+                            self.passKitCertificateNameCorrect(jsonResponse.passKitCertificateNameCorrect);
+                            self.passKitCertificateExpired(jsonResponse.passKitCertificateExpired);
 
                             self.hasAuthenticationToken(jsonResponse.hasAuthenticationToken);
-                            self.authenticationTokenIsCorrectLength(jsonResponse.authenticationTokenIsCorrectLength);
                             self.hasWebServiceUrl(jsonResponse.hasWebServiceUrl);
                             self.webServiceUrlIsHttps(jsonResponse.webServiceUrlIsHttps);
+                            self.authenticationTokenRequiresWebServiceUrl(jsonResponse.authenticationTokenRequiresWebServiceUrl);
+                            self.webServiceUrlRequiresAuthenticationToken(jsonResponse.webServiceUrlRequiresAuthenticationToken);
 
                         } else {
                             self.processedSuccessfully(false);
@@ -289,20 +302,27 @@
             self.hasAppLaunchUrl = ko.observable(false);
             self.hasAssociatedStoreIdentifiers = ko.observable(false);
 
-            self.wwdrCertificateExpired = ko.observable(false);
-            self.wwdrCertificateSubjectMatches = ko.observable(false);
-
             self.hasMatchingPassTypeIdentifier = ko.observable(false);
             self.hasMatchingTeamIdentifier = ko.observable(false);
             self.signedByApple = ko.observable(false);
             self.signatureExpirationDate = ko.observable(null);
             self.hasSignatureExpired = ko.observable(false);
 
+            self.passKitCertificateFound = ko.observable(false);
+            self.wwdrCertificateFound = ko.observable(false);
+
+            self.passKitCertificateNameCorrect = ko.observable(false);
+            self.passKitCertificateExpired = ko.observable(false);
+
+            self.wwdrCertificateExpired = ko.observable(false);
+            self.wwdrCertificateSubjectMatches = ko.observable(false);
+
             self.hasAuthenticationToken = ko.observable(false);
             self.authenticationTokenIsCorrectLength = ko.observable(false);
             self.hasWebServiceUrl = ko.observable(false);
             self.webServiceUrlIsHttps = ko.observable(false);
-
+            self.authenticationTokenRequiresWebServiceUrl = ko.observable(false);
+            self.webServiceUrlRequiresAuthenticationToken = ko.observable(false);
         }
 
         var viewModel = new Model();

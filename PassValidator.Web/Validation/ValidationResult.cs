@@ -47,10 +47,20 @@
 
         public bool HasAuthenticationToken { get; set; }
 
-        public bool AuthenticationTokenIsCorrectLength { get; set; }
-
         public bool HasWebServiceUrl { get; set; }
 
         public bool WebServiceUrlIsHttps { get; set; }
+
+        public bool AuthenticationTokenRequiresWebServiceUrl { get; set; }
+
+        public bool WebServiceUrlRequiresAuthenticationToken { get; set; }
+
+        public bool PassKitCertificateNameCorrect { get; set; }
+
+        public bool PassKitCertificateExpired { get; set; } = true;
+
+        public bool WWDRCertificateFound { get; set; }
+
+        public bool PassKitCertificateFound { get; set; }
     }
 }

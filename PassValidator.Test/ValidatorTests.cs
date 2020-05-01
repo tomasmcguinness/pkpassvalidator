@@ -5,7 +5,7 @@ using PassValidator.Web.Validation;
 namespace PassValidator.Test
 {
     [TestClass]
-    public class ValidatorTests
+    public class ValidatorTestsC:\Development\pkpassvalidator\PassValidator.Test\ValidatorTests.cs
     {
         [TestMethod]
         public void TestMethod1()

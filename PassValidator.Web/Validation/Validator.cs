@@ -210,12 +210,8 @@ namespace PassValidator.Web.Validation
                     result.PassKitCertificateExpired = passKitCertificate.NotAfter < DateTime.UtcNow;
                 }
 
-                if (appleWWDRCertificate != null)
-                {
-                    result.WWDRCertificateFound = true;
-                    result.WWDRCertificateExpired = appleWWDRCertificate.NotAfter < DateTime.UtcNow;
-                    result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Subject == wwdrCertSubject;
-                }
+                result.WWDRCertificateExpired = appleWWDRCertificate.NotAfter < DateTime.UtcNow;
+                result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Subject == wwdrCertSubject;
 
                 result.SignedByApple = signer.Certificate.IssuerName.Name == wwdrCertSubject;
 

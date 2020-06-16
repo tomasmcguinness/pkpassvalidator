@@ -62,5 +62,7 @@
         public bool WWDRCertificateFound { get; set; }
 
         public bool PassKitCertificateFound { get; set; }
+
+        public bool AuthenticationTokenCorrectLength { get; internal set; }
     }
 }

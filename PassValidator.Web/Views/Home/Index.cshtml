@@ -103,6 +103,10 @@
     </p>
     <div id="results" data-bind="visible: isShowingResults" style="display:none;">
         <h2>Validation Results:</h2>
+        <div>
+            <script type='text/javascript' src='https://ko-fi.com/widgets/widget_2.js'></script>
+            <script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#29abe0', 'G2G11TQK5'); kofiwidget2.draw();</script>
+        </div>
         <div data-bind="visible: processedSuccessfully" style="display:none;">
             <h3>File Structure</h3>
             <ul>
@@ -111,7 +115,7 @@
                 <li><i data-bind="css: getStyle(hasSignature())"></i>Has signature file</li>
                 <li><i data-bind="css: getStyle(hasIcon1x())"></i>Has icon.png file</li>
                 <li><i data-bind="css: getStyle(hasIcon2x())"></i>Has icon@2x.png file</li>
-                <li><i data-bind="css: getStyle(hasIcon3x())"></i>Has icon@3x.png file</li>
+                <li><i data-bind="css: getStyle(hasIcon3x())"></i>Has icon@3x.png file (not mandatory)</li>
             </ul>
 
             <h3>Standard Keys</h3>
@@ -142,8 +146,9 @@
                     <li><i data-bind="css: getStyle(hasWebServiceUrl())"></i>Includes WebServiceUrl</li>
                     <li><i data-bind="css: getStyle(webServiceUrlIsHttps())"></i>WebServiceUrl is HTTPS</li>
                     <li><i data-bind="css: getStyle(hasAuthenticationToken())"></i>Includes AuthenticationToken</li>
-                    <li data-bind="visible: authenticationTokenRequiresWebServiceUrl"><i class="thumbs down outline icon"></i>AuthenticationToken present but no WebServiceUrl found</lidata-bind="visible:>
-                    <li data-bind="visible: webServiceUrlRequiresAuthenticationToken"><i class="thumbs down outline icon" ></i>WebServiceUrl requires an AuthenticationToken</lidata-bind="visible:>
+                    <li data-bind="visible: hasAuthenticationToken"><i data-bind="css: getStyle(authenticationTokenCorrectLength())"></i>AuthenticationToken is 16 characters in length</li>
+                    <li data-bind="visible: authenticationTokenRequiresWebServiceUrl"><i class="thumbs down outline icon"></i>AuthenticationToken present but no WebServiceUrl found</li>
+                    <li data-bind="visible: webServiceUrlRequiresAuthenticationToken"><i class="thumbs down outline icon"></i>WebServiceUrl requires an AuthenticationToken</li>
                 </ul>
             </div>
 
@@ -173,12 +178,14 @@
     <h2>Supporting this project</h2>
     <p>
         If pkpass validator has saved you time, please consider buying me a coffee using the button below:
-    </p>
-    <p>
-        <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet"><a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/fMKJ2NnQ3"><img src="https://www.buymeacoffee.com/assets/img/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span></a>
+        <div>
+            <script type='text/javascript' src='https://ko-fi.com/widgets/widget_2.js'></script>
+            <script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#29abe0', 'G2G11TQK5'); kofiwidget2.draw();</script>
+        </div>
     </p>
     <h2>Release History</h2>
     <ul>
+        <li><a class="ui small blue label">1 June 2020</a> - Added authentication token length check</li>
         <li><a class="ui small blue label">1st May 2020</a> - Fixed webServiceUrl/AuthToken warnings. Added extra PassKit cert checks</li>
         <li><a class="ui small blue label">13th February 2020</a> - Changed WWDR Subject validation</li>
         <li><a class="ui small blue label">22nd January 2020</a> - Added serial number length check</li>
@@ -190,7 +197,7 @@
         <li><a class="ui small blue label">2nd October 2018</a> - Updating validation to handle different order of files</li>
         <li><a class="ui small blue label">14th August 2018</a> - Added check to ensure signature is in date</li>
         <li><a class="ui small blue label">25th July 2018</a> - First release with basic siganture checks</li>
-    </ul>   
+    </ul>
     <hr />
     <div>
         Built by Tomas McGuinness. Last updated in Feb, 2020 - <a href="mailto:tomas@coldbear.co.uk">tomas@coldbear.co.uk</a> - <a href="https://www.twitter.com/tomasmcguinness">@@tomasmcguinness</a> - <a href="https://wwww.tomasmcguinness.com">tomasmcguinness.com</a>
@@ -272,6 +279,7 @@
                             self.passKitCertificateExpired(jsonResponse.passKitCertificateExpired);
 
                             self.hasAuthenticationToken(jsonResponse.hasAuthenticationToken);
+                            self.authenticationTokenCorrectLength(jsonResponse.authenticationTokenCorrectLength);
                             self.hasWebServiceUrl(jsonResponse.hasWebServiceUrl);
                             self.webServiceUrlIsHttps(jsonResponse.webServiceUrlIsHttps);
                             self.authenticationTokenRequiresWebServiceUrl(jsonResponse.authenticationTokenRequiresWebServiceUrl);
@@ -325,6 +333,7 @@
             self.wwdrCertificateSubjectMatches = ko.observable(false);
 
             self.hasAuthenticationToken = ko.observable(false);
+            self.authenticationTokenCorrectLength = ko.observable(false);
             self.authenticationTokenIsCorrectLength = ko.observable(false);
             self.hasWebServiceUrl = ko.observable(false);
             self.webServiceUrlIsHttps = ko.observable(false);

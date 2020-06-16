@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography.Pkcs;
@@ -101,6 +100,9 @@ namespace PassValidator.Web.Validation
                                     if (jsonObject.ContainsKey("authenticationToken"))
                                     {
                                         result.HasAuthenticationToken = true;
+
+                                        var authToken = GetKeyStringValue(jsonObject, "authenticationToken");
+                                        result.AuthenticationTokenCorrectLength = authToken.Length >= 16;
                                     }
 
                                     if (result.HasAuthenticationToken && !result.HasWebServiceUrl)

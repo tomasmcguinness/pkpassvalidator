@@ -212,26 +212,34 @@ namespace PassValidator.Web.Validation
                     result.PassKitCertificateExpired = passKitCertificate.NotAfter < DateTime.UtcNow;
                 }
 
-                result.WWDRCertificateExpired = appleWWDRCertificate.NotAfter < DateTime.UtcNow;
-                result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Subject == wwdrCertSubject;
-
-                result.SignedByApple = signer.Certificate.IssuerName.Name == wwdrCertSubject;
-
-                if (result.SignedByApple)
+                if (appleWWDRCertificate is null)
                 {
-                    var cnValues = Parse(signer.Certificate.Subject, "CN");
-                    var ouValues = Parse(signer.Certificate.Subject, "OU");
+                    result.SignedByApple = false;
+                }
+                else
+                {
 
-                    var passTypeIdentifierSubject = cnValues[0];
-                    signaturePassTypeIdentifier = passTypeIdentifierSubject.Replace("Pass Type ID: ", "");
+                    result.WWDRCertificateExpired = appleWWDRCertificate.NotAfter < DateTime.UtcNow;
+                    result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Subject == wwdrCertSubject;
 
-                    if (ouValues != null && ouValues.Count > 0)
+                    result.SignedByApple = signer.Certificate.IssuerName.Name == wwdrCertSubject;
+
+                    if (result.SignedByApple)
                     {
-                        signatureTeamIdentifier = ouValues[0];
-                    }
+                        var cnValues = Parse(signer.Certificate.Subject, "CN");
+                        var ouValues = Parse(signer.Certificate.Subject, "OU");
 
-                    result.HasSignatureExpired = signer.Certificate.NotAfter < DateTime.UtcNow;
-                    result.SignatureExpirationDate = signer.Certificate.NotAfter.ToString("yyyy-MM-dd HH:mm:ss");
+                        var passTypeIdentifierSubject = cnValues[0];
+                        signaturePassTypeIdentifier = passTypeIdentifierSubject.Replace("Pass Type ID: ", "");
+
+                        if (ouValues != null && ouValues.Count > 0)
+                        {
+                            signatureTeamIdentifier = ouValues[0];
+                        }
+
+                        result.HasSignatureExpired = signer.Certificate.NotAfter < DateTime.UtcNow;
+                        result.SignatureExpirationDate = signer.Certificate.NotAfter.ToString("yyyy-MM-dd HH:mm:ss");
+                    }
                 }
 
                 result.PassTypeIdentifierMatches = passTypeIdentifier == signaturePassTypeIdentifier;

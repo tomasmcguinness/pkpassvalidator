@@ -45,6 +45,8 @@
 
         public bool WWDRCertificateSubjectMatches { get; set; }
 
+        public bool WWDRCertificateIsCorrectVersion { get; set; }
+
         public bool HasAuthenticationToken { get; set; }
 
         public bool HasWebServiceUrl { get; set; }

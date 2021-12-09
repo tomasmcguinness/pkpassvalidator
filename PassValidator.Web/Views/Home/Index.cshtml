@@ -164,6 +164,7 @@
             </ul>
             <h3>WWDR Certificate</h3>
             <ul>
+                <li><i data-bind="css: getStyle(wwdrCertificateIsCorrectVersion())"></i>WWDR Certificate is <a href="#wwdc-certificate-versions">correct version (G1)</a></li>
                 <li><i data-bind="css: getStyle(wwdrCertificateSubjectMatches())"></i>WWDR Certificate Subject</li>
                 <li><i data-bind="css: getStyle(!wwdrCertificateExpired())"></i>WWDR Certificate in date</li>
             </ul>
@@ -177,6 +178,10 @@
             Failed to process the pkpass file.
         </div>
     </div>
+    <h3 id="wwdc-certificate-versions">WWDC Certificate Versions</h3>
+    <p>As of November 2021, the Apple PKI page at <a href="https://www.apple.com/certificateauthority/">https://www.apple.com/certificateauthority/</a>
+    lists five "Worldwide Developer Relations" certificates.</p>
+    <p><strong>Only the G1 certificate (expiring 02/07/2023 21:48:47 UTC) is valid for signing passes.</strong></p>
     <hr />
     <h2>Supporting this project</h2>
     <p>
@@ -277,6 +282,7 @@
 
                             self.wwdrCertificateExpired(jsonResponse.wwdrCertificateExpired);
                             self.wwdrCertificateSubjectMatches(jsonResponse.wwdrCertificateSubjectMatches);
+                            self.wwdrCertificateIsCorrectVersion(jsonResponse.wwdrCertificateIsCorrectVersion);
 
                             self.passKitCertificateNameCorrect(jsonResponse.passKitCertificateNameCorrect);
                             self.passKitCertificateExpired(jsonResponse.passKitCertificateExpired);
@@ -334,6 +340,7 @@
 
             self.wwdrCertificateExpired = ko.observable(false);
             self.wwdrCertificateSubjectMatches = ko.observable(false);
+            self.wwdrCertificateIsCorrectVersion = ko.observable(false);
 
             self.hasAuthenticationToken = ko.observable(false);
             self.authenticationTokenCorrectLength = ko.observable(false);

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -11,6 +12,7 @@ namespace PassValidator.Web.Validation
 {
     public class Validator
     {
+        private string[] validWWDRCertificateSerialNumbers = new[] {"01DEBCC4396DA010"};
         public ValidationResult Validate(byte[] passContent)
         {
             ValidationResult result = new ValidationResult();
@@ -179,9 +181,9 @@ namespace PassValidator.Web.Validation
 
                 foreach (var cert in signedCms.Certificates)
                 {
-                    if (cert.IssuerName.Name == "CN=Apple Root CA, OU=Apple Certification Authority, O=Apple Inc., C=US")
+                    if (cert.IssuerName.Name.Contains("OU=Apple Certification Authority"))
                     {
-                        // This is the WWDR certificate.
+                        // Assume this is a valid WWDR certificate; we validate the version separately based on serial #
                         appleWWDRCertificate = cert;
                     }
                     else if (cert.IssuerName.Name == "CN=Apple Worldwide Developer Relations Certification Authority, OU=Apple Worldwide Developer Relations, O=Apple Inc., C=US")
@@ -216,13 +218,15 @@ namespace PassValidator.Web.Validation
                 {
                     result.SignedByApple = false;
                 }
-                else
+                else 
                 {
-
                     result.WWDRCertificateExpired = appleWWDRCertificate.NotAfter < DateTime.UtcNow;
                     result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Subject == wwdrCertSubject;
 
                     result.SignedByApple = signer.Certificate.IssuerName.Name == wwdrCertSubject;
+
+                    result.WWDRCertificateIsCorrectVersion =
+                        validWWDRCertificateSerialNumbers.Contains(appleWWDRCertificate.SerialNumber);
 
                     if (result.SignedByApple)
                     {

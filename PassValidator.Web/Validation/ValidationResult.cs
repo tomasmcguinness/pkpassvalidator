@@ -66,5 +66,6 @@
         public bool PassKitCertificateFound { get; set; }
 
         public bool AuthenticationTokenCorrectLength { get; internal set; }
+        public bool PassKitCertificateIssuedByApple { get; internal set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Asn1.X509;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,15 +13,14 @@ namespace PassValidator.Web.Validation
 {
     public class Validator
     {
-        private string[] validWWDRCertificateSerialNumbers = new[] {"01DEBCC4396DA010"};
+        private string G4WWDRCertificateSerialNumber = "13DC77955271E53DC632E8CCFFE521F3CCC5CED2";
+
         public ValidationResult Validate(byte[] passContent)
         {
             ValidationResult result = new ValidationResult();
 
-            string passTypeIdentifier = null;
-            string teamIdentifier = null;
-            string signaturePassTypeIdentifier = null;
-            string signatureTeamIdentifier = null;
+            string manifestPassTypeIdentifier = null;
+            string manifestTeamIdentifier = null;
             byte[] manifestFile = null;
             byte[] signatureFile = null;
 
@@ -59,11 +59,11 @@ namespace PassValidator.Web.Validation
 
                                     var jsonObject = JObject.Parse(Encoding.UTF8.GetString(file));
 
-                                    passTypeIdentifier = GetKeyStringValue(jsonObject, "passTypeIdentifier");
-                                    result.HasPassTypeIdentifier = !string.IsNullOrWhiteSpace(passTypeIdentifier);
+                                    manifestPassTypeIdentifier = GetKeyStringValue(jsonObject, "passTypeIdentifier");
+                                    result.HasPassTypeIdentifier = !string.IsNullOrWhiteSpace(manifestPassTypeIdentifier);
 
-                                    teamIdentifier = GetKeyStringValue(jsonObject, "teamIdentifier");
-                                    result.HasTeamIdentifier = !string.IsNullOrWhiteSpace(teamIdentifier);
+                                    manifestTeamIdentifier = GetKeyStringValue(jsonObject, "teamIdentifier");
+                                    result.HasTeamIdentifier = !string.IsNullOrWhiteSpace(manifestTeamIdentifier);
 
                                     var description = GetKeyStringValue(jsonObject, "description");
                                     result.HasDescription = !string.IsNullOrWhiteSpace(description);
@@ -172,23 +172,30 @@ namespace PassValidator.Web.Validation
 
                 var signer = signedCms.SignerInfos[0];
 
-                var wwdrCertSubject = "CN=Apple Worldwide Developer Relations Certification Authority, OU=Apple Worldwide Developer Relations, O=Apple Inc., C=US";
-
                 // There are two certificates attached. One is the PassType certificate. One is the WWDR certificate.
                 //
-                X509Certificate2 appleWWDRCertificate = null;
                 X509Certificate2 passKitCertificate = null;
 
                 foreach (var cert in signedCms.Certificates)
                 {
-                    if (cert.IssuerName.Name.Contains("OU=Apple Certification Authority"))
+                    if (cert.SerialNumber == G4WWDRCertificateSerialNumber)
                     {
-                        // Assume this is a valid WWDR certificate; we validate the version separately based on serial #
-                        appleWWDRCertificate = cert;
+                        result.SignedByApple = true;
+                        result.WWDRCertificateFound = true;
+                        result.WWDRCertificateIsCorrectVersion = true;
                     }
-                    else if (cert.IssuerName.Name == "CN=Apple Worldwide Developer Relations Certification Authority, OU=Apple Worldwide Developer Relations, O=Apple Inc., C=US")
+                    else
                     {
-                        passKitCertificate = cert;
+                        // Find another cert issued by Apple Inc.
+                        var issuerName = new X509Name(cert.Issuer);
+
+                        var issuerCommonName = issuerName.GetValueList(X509Name.CN);
+                        var issuerOrganisation = issuerName.GetValueList(X509Name.O);
+
+                        if ((string)issuerOrganisation[0] == "Apple Inc." && (string)issuerCommonName[0] == "Apple Worldwide Developer Relations Certification Authority")
+                        {
+                            passKitCertificate = cert;
+                        }
                     }
                 }
 
@@ -207,47 +214,37 @@ namespace PassValidator.Web.Validation
                             var value = Encoding.ASCII.GetString(extension.RawData);
                             value = value.Substring(2, value.Length - 2);
 
-                            result.PassKitCertificateNameCorrect = value == passTypeIdentifier;
+                            result.PassKitCertificateNameCorrect = value == manifestPassTypeIdentifier;
+                            break;
                         }
                     }
 
                     result.PassKitCertificateExpired = passKitCertificate.NotAfter < DateTime.UtcNow;
+
+                    var issuerName = new X509Name(passKitCertificate.Issuer);
+                    var passKitIssuerOrg = issuerName.GetValueList(X509Name.O)[0] as string;
+                    var passKitIssuerCommonName = issuerName.GetValueList(X509Name.CN)[0] as string;
+
+                    var orgIsApple = passKitIssuerOrg == "Apple Inc.";
+                    var cnIsWWDR = passKitIssuerCommonName == "Apple Worldwide Developer Relations Certification Authority";
+
+                    result.PassKitCertificateIssuedByApple = orgIsApple && cnIsWWDR;
                 }
 
-                if (appleWWDRCertificate is null)
-                {
-                    result.SignedByApple = false;
-                }
-                else 
-                {
-                    result.WWDRCertificateExpired = appleWWDRCertificate.NotAfter < DateTime.UtcNow;
-                    result.WWDRCertificateSubjectMatches = appleWWDRCertificate.Subject == wwdrCertSubject;
+                // Now check the subject and type idenfier match.
+                //
+                var certName = new X509Name(signer.Certificate.Subject);
 
-                    result.SignedByApple = signer.Certificate.IssuerName.Name == wwdrCertSubject;
+                var certificateCommonName = certName.GetValueList(X509Name.CN)[0] as string;
+                var signaturePassTypeIdentifier = certificateCommonName.Replace("Pass Type ID: ", "");
 
-                    result.WWDRCertificateIsCorrectVersion =
-                        validWWDRCertificateSerialNumbers.Contains(appleWWDRCertificate.SerialNumber);
+                var certificateOrganisationUnit = certName.GetValueList(X509Name.OU)[0] as string;
 
-                    if (result.SignedByApple)
-                    {
-                        var cnValues = Parse(signer.Certificate.Subject, "CN");
-                        var ouValues = Parse(signer.Certificate.Subject, "OU");
+                result.HasSignatureExpired = signer.Certificate.NotAfter < DateTime.UtcNow;
+                result.SignatureExpirationDate = signer.Certificate.NotAfter.ToString("yyyy-MM-dd HH:mm:ss");
 
-                        var passTypeIdentifierSubject = cnValues[0];
-                        signaturePassTypeIdentifier = passTypeIdentifierSubject.Replace("Pass Type ID: ", "");
-
-                        if (ouValues != null && ouValues.Count > 0)
-                        {
-                            signatureTeamIdentifier = ouValues[0];
-                        }
-
-                        result.HasSignatureExpired = signer.Certificate.NotAfter < DateTime.UtcNow;
-                        result.SignatureExpirationDate = signer.Certificate.NotAfter.ToString("yyyy-MM-dd HH:mm:ss");
-                    }
-                }
-
-                result.PassTypeIdentifierMatches = passTypeIdentifier == signaturePassTypeIdentifier;
-                result.TeamIdentifierMatches = teamIdentifier == signatureTeamIdentifier;
+                result.PassTypeIdentifierMatches = manifestPassTypeIdentifier == signaturePassTypeIdentifier;
+                result.TeamIdentifierMatches = manifestTeamIdentifier == certificateOrganisationUnit;
             }
 
             return result;

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
-using PassValidator.Web.Validation;
+using PassValidator.Validator;
 
 namespace PassValidator.Web.Controllers;
 
@@ -19,7 +19,7 @@ public class ValidationController : ControllerBase
         file.CopyTo(ms);
         ms.Position = 0;
 
-        Validator validator = new Validator();
+        var validator = new Validator.Validator();
         var result = validator.Validate(ms.ToArray());
 
         await LogResultAsync(result);

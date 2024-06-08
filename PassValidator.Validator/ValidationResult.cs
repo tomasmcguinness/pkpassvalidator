@@ -1,4 +1,4 @@
-﻿namespace PassValidator.Web.Validation;
+﻿namespace PassValidator.Validator;
 
 public class ValidationResult
 {
@@ -30,7 +30,7 @@ public class ValidationResult
 
     public bool HasDescription { get; set; }
 
-    public bool HasFormatVersion { get; set; }
+    public bool HasFormatVersion { get; set; } = false;
 
     public bool HasSerialNumber { get; set; }
 

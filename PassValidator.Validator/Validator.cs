@@ -1,14 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Asn1.X509;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Asn1.X509;
 
-namespace PassValidator.Web.Validation;
+namespace PassValidator.Validator;
 
 public class Validator
 {
@@ -18,13 +15,13 @@ public class Validator
     {
         var result = new ValidationResult();
 
-        string manifestPassTypeIdentifier = null;
-        string manifestTeamIdentifier = null;
-        byte[] manifestFile = null;
-        byte[] signatureFile = null;
+        string? manifestPassTypeIdentifier = null;
+        string? manifestTeamIdentifier = null;
+        byte[]? manifestFile = null;
+        byte[]? signatureFile = null;
 
         using var zipToOpen = new MemoryStream(passContent);
-        using var archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read, false);
+        using var archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read, true);
         foreach (var e in archive.Entries)
         {
             if (e.FullName.ToLower().Equals("manifest.json"))
@@ -59,9 +56,9 @@ public class Validator
                 var description = GetKeyStringValue(jsonObject, "description");
                 result.HasDescription = !string.IsNullOrWhiteSpace(description);
 
-                if (jsonObject.ContainsKey("formatVersion"))
+                if (jsonObject.TryGetValue("formatVersion", out var version))
                 {
-                    var formatVersion = jsonObject["formatVersion"].Value<int>();
+                    var formatVersion = version.Value<int>();
                     result.HasFormatVersion = formatVersion == 1;
                 }
 
@@ -138,9 +135,9 @@ public class Validator
 
         zipToOpen.Close();
         if (!result.HasManifest) return result;
-            
-        ContentInfo contentInfo = new ContentInfo(manifestFile);
-        SignedCms signedCms = new SignedCms(contentInfo, true);
+
+        var contentInfo = new ContentInfo(manifestFile);
+        var signedCms = new SignedCms(contentInfo, true);
 
         signedCms.Decode(signatureFile);
 
@@ -157,7 +154,7 @@ public class Validator
 
         // There are two certificates attached. One is the PassType certificate. One is the WWDR certificate.
         //
-        X509Certificate2 passKitCertificate = null;
+        X509Certificate2? passKitCertificate = null;
 
         foreach (var cert in signedCms.Certificates)
         {
@@ -175,7 +172,8 @@ public class Validator
                 var issuerCommonName = issuerName.GetValueList(X509Name.CN);
                 var issuerOrganisation = issuerName.GetValueList(X509Name.O);
 
-                if ((string)issuerOrganisation[0] == "Apple Inc." && (string)issuerCommonName[0] == "Apple Worldwide Developer Relations Certification Authority")
+                if ((string)issuerOrganisation[0] == "Apple Inc." && (string)issuerCommonName[0] ==
+                    "Apple Worldwide Developer Relations Certification Authority")
                 {
                     passKitCertificate = cert;
                 }
@@ -192,14 +190,13 @@ public class Validator
                 // This is an Apple custom extension (1.2.840.113635.100.6.1.16) and in good passes, 
                 // the value matches the pass type identifier.
                 //
-                if (extension.Oid.Value == "1.2.840.113635.100.6.1.16")
-                {
-                    var value = Encoding.ASCII.GetString(extension.RawData);
-                    value = value.Substring(2, value.Length - 2);
+                if (extension.Oid?.Value != "1.2.840.113635.100.6.1.16") continue;
 
-                    result.PassKitCertificateNameCorrect = value == manifestPassTypeIdentifier;
-                    break;
-                }
+                var value = Encoding.ASCII.GetString(extension.RawData);
+                value = value.Substring(2, value.Length - 2);
+
+                result.PassKitCertificateNameCorrect = value == manifestPassTypeIdentifier;
+                break;
             }
 
             result.PassKitCertificateExpired = passKitCertificate.NotAfter < DateTime.UtcNow;
@@ -209,17 +206,18 @@ public class Validator
             var passKitIssuerCommonName = issuerName.GetValueList(X509Name.CN)[0] as string;
 
             var orgIsApple = passKitIssuerOrg == "Apple Inc.";
-            var cnIsWwdr = passKitIssuerCommonName == "Apple Worldwide Developer Relations Certification Authority";
+            var cnIsWwdr = passKitIssuerCommonName ==
+                           "Apple Worldwide Developer Relations Certification Authority";
 
             result.PassKitCertificateIssuedByApple = orgIsApple && cnIsWwdr;
         }
 
         // Now check the subject and type identifier match.
         //
-        var certName = new X509Name(signer.Certificate.Subject);
+        var certName = new X509Name(signer.Certificate?.Subject);
 
         var certificateCommonName = certName.GetValueList(X509Name.CN)[0] as string;
-        var signaturePassTypeIdentifier = certificateCommonName.Replace("Pass Type ID: ", "");
+        var signaturePassTypeIdentifier = certificateCommonName?.Replace("Pass Type ID: ", "");
 
         var certificateOrganisationUnit = certName.GetValueList(X509Name.OU)[0] as string;
 

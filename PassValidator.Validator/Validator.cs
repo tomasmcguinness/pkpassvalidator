@@ -172,10 +172,13 @@ public class Validator
                 var issuerCommonName = issuerName.GetValueList(X509Name.CN);
                 var issuerOrganisation = issuerName.GetValueList(X509Name.O);
 
-                if ((string)issuerOrganisation[0] == "Apple Inc." && (string)issuerCommonName[0] ==
-                    "Apple Worldwide Developer Relations Certification Authority")
+                if (issuerCommonName.Count > 0 && issuerOrganisation.Count > 0)
                 {
-                    passKitCertificate = cert;
+                    if ((string)issuerOrganisation[0] == "Apple Inc." && (string)issuerCommonName[0] ==
+                        "Apple Worldwide Developer Relations Certification Authority")
+                    {
+                        passKitCertificate = cert;
+                    }
                 }
             }
         }
@@ -219,7 +222,14 @@ public class Validator
         var certificateCommonName = certName.GetValueList(X509Name.CN)[0] as string;
         var signaturePassTypeIdentifier = certificateCommonName?.Replace("Pass Type ID: ", "");
 
-        var certificateOrganisationUnit = certName.GetValueList(X509Name.OU)[0] as string;
+        var organisationUnits = certName.GetValueList(X509Name.OU);
+
+        string certificateOrganisationUnit = null;
+
+        if (organisationUnits.Count > 0)
+        {
+            certificateOrganisationUnit = organisationUnits[0] as string;
+        }
 
         result.HasSignatureExpired = signer.Certificate.NotAfter < DateTime.UtcNow;
         result.SignatureExpirationDate = signer.Certificate.NotAfter.ToString("yyyy-MM-dd HH:mm:ss");

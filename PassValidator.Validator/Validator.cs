@@ -45,7 +45,8 @@ public class Validator
                 ms.Position = 0;
                 var file = ms.ToArray();
 
-                var jsonObject = JObject.Parse(Encoding.UTF8.GetString(file));
+                var json = Encoding.UTF8.GetString(file);
+                var jsonObject = JObject.Parse(json);
 
                 manifestPassTypeIdentifier = GetKeyStringValue(jsonObject, "passTypeIdentifier");
                 result.HasPassTypeIdentifier = !string.IsNullOrWhiteSpace(manifestPassTypeIdentifier);

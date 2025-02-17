@@ -221,7 +221,16 @@ public class Validator
         var certName = new X509Name(signer.Certificate?.Subject);
 
         var certificateCommonName = certName.GetValueList(X509Name.CN)[0] as string;
-        var signaturePassTypeIdentifier = certificateCommonName?.Replace("Pass Type ID: ", "");
+        string signaturePassTypeIdentifier;
+
+        if (certificateCommonName?.Contains("Pass Type ID with NFC:") == true)
+        {
+            signaturePassTypeIdentifier = certificateCommonName?.Replace("Pass Type ID with NFC: ", "");
+        }
+        else
+        {
+            signaturePassTypeIdentifier = certificateCommonName?.Replace("Pass Type ID: ", "");
+        }
 
         var organisationUnits = certName.GetValueList(X509Name.OU);
 
